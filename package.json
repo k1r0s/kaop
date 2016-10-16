@@ -4,12 +4,15 @@
   "description": "simple js oop lib helper",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "keywords": [
     "framework",
     "oop"
   ],
   "author": "ciroreed",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "^3.1.2"
+  }
 }
