@@ -1,4 +1,4 @@
-module.exprots = annotations = {
+module.exports = annotations = {
   arr: [
     function $override(opts){
       opts.args.unshift(opts.parentScope[opts.methodName].bind(opts.scope))
