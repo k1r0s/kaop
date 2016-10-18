@@ -3,89 +3,57 @@ var main = require("../index")
 var extend = main.extend
 var annotations = main.annotations
 
-annotations.add(function $twice(opts){
-  return opts.method() + opts.method()
-})
+describe("unit test", function(){
+  describe("annotations::compile()", function(){
 
-var Person = extend(function(){}, {
-  constructor: function(name, dborn){
-    this.name = name
-    this.dborn = dborn
-  },
-  run: function(){
-    return "Im running!"
-  },
-  getAge: function(){
-    var currentYear = new Date().getFullYear()
-    var yearBorn = this.dborn.getFullYear()
-    return currentYear - yearBorn
-  }
-})
+    it("propertyValue are falsy values, so we must receive it as normal", function(){
+      assert.strictEqual(null, annotations.compile(undefined, undefined, null))
+      assert.strictEqual(undefined, annotations.compile(undefined, undefined, undefined))
+      assert.strictEqual(0, annotations.compile(undefined, undefined, 0))
+      assert.strictEqual(false, annotations.compile(undefined, undefined, false))
+    })
 
-var Programmer = extend(Person, {
-  constructor: function $override(parent, name, dborn, favouriteLanguage){
-    parent(name, dborn)
-    this.favLang = favouriteLanguage
-  },
-  run: function $override(parent){
-    return parent() + " but... not as faster, coz im fat :/"
-  },
-  code: function(){
-    return "Im codding in " + this.favLang
-  }
-})
+    it("propertyValue are numbers, should be retrieved without modifications", function(){
+      assert.strictEqual(1, annotations.compile(undefined, undefined, 1))
+      assert.strictEqual(-2, annotations.compile(undefined, undefined, -2))
+      assert.strictEqual(313, annotations.compile(undefined, undefined, 313))
+      assert.strictEqual(437, annotations.compile(undefined, undefined, 437))
+      assert.strictEqual(437.333, annotations.compile(undefined, undefined, 437.333))
+    })
 
-var CoolProgrammer = extend(Programmer, {
-  run: function(){
-    return "IM FAST AS HELL!! GET OUT OF MY WAY!"
-  },
-  fly: function $twice(){
-    return "yay drugs! "
-  }
-})
+    it("propertyValue are complex types as strings, objects or functions", function(){
+      assert(typeof annotations.compile(undefined, undefined, function(){}) === "function")
+      assert.deepEqual(["prop1", "prop2", "prop3"], annotations.compile(undefined, undefined, ["prop1", "prop2", "prop3"]))
+      assert.deepEqual({}, annotations.compile(undefined, undefined, {}))
+      assert.strictEqual("something", annotations.compile(undefined, undefined, "something"))
+    })
 
-var normalPerson;
-var normalProgrammer;
-var ciroreed;
+    it("propertyValue is an array that contains a function in the last slot, it should return the annotatedFunction", function(){
+      assert(typeof annotations.compile(undefined, undefined, ["$override", function(){}]) === "function")
+    })
 
-describe("begin k-oop tests", function(){
-
-  before(function(){
-    normalPerson = new Person("Joe", new Date(1990, 2, 21))
-    normalProgrammer = new Programmer("Mike", new Date(1982, 7, 18), "Java")
-    ciroreed = new CoolProgrammer("Ciro", new Date(1990, 8, 22), "Javascript")
+    it("if contains any annotation that was not added yet to the annotations pool, it should return the array instead", function(){
+      assert(typeof annotations.compile(undefined, undefined, ["$annotationThatNotExists", function(){}]) !== "function")
+    })
   })
 
-  it("should have several properties", function(){
-    assert.equal("Joe", normalPerson.name)
-    assert.equal("Mike", normalProgrammer.name)
-    assert.equal("Ciro", ciroreed.name)
+  describe("annotations::add, ::names, ::getAnnotation", function(){
 
-    assert.notEqual("C#", ciroreed.favLang)
+    before(function(){
+      annotations.add(function $prop1(){})
+      annotations.add(function $prop2(){})
+      annotations.add(function $prop3(){})
+      annotations.add(function $prop4(){})
+    })
+
+    it("annotations::names() should return all the annotation names", function(){
+      assert.deepEqual(
+        ['$override', '$twice', '$prop1', '$prop2', '$prop3', '$prop4' ],
+        annotations.names()
+      )
+    })
+    it("annotations::getAnnotation() should return the annotation function definition", function(){
+      assert.strictEqual("$prop3", annotations.getAnnotation("$prop3").name)
+    })
   })
-
-  it("inner instances should inherit superClass properties", function(){
-    assert.equal(26, normalPerson.getAge())
-    assert.notEqual(26, normalProgrammer.getAge())
-    assert.equal(26, ciroreed.getAge())
-
-    assert.throws(function(){
-      normalPerson.code()
-    }, Error)
-
-    assert.notEqual("Im codding in Java", ciroreed.code())
-    assert.equal("Im codding in Java", normalProgrammer.code())
-  })
-
-  it("should override methods with $override", function(){
-    assert.equal("Im running!", normalPerson.run())
-    assert.notEqual("Im running!", normalProgrammer.run())
-    assert.equal("Im running! but... not as faster, coz im fat :/", normalProgrammer.run())
-    assert.equal("IM FAST AS HELL!! GET OUT OF MY WAY!", ciroreed.run())
-  })
-
-  it("methods should be modified with annotations", function(){
-    assert.equal("yay drugs! yay drugs! ", ciroreed.fly());
-  })
-
 })

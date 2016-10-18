@@ -20,14 +20,24 @@ module.exports = annotations = {
       }
     }
   },
-  delegate: function(proto, methodName, otherProperties){
-    var annotatedMethod = this.getAnnotation(otherProperties[methodName].name)
+  compile: function(superClass, propertyName, propertyValue){
+    if(!(
+      propertyValue &&
+      typeof propertyValue.length === "number" &&
+      typeof propertyValue[propertyValue.length - 1] === "function" &&
+      propertyValue.filter(function(e, index, arr){ return index !== arr.length - 1}).every(this.getAnnotation, this)
+    )){
+      return propertyValue
+    }
+
+    var annotatedMethod = this.getAnnotation(propertyValue[0])
+
     return function(){
       return annotatedMethod({
         scope: this,
-        parentScope: proto,
-        method: otherProperties[methodName],
-        methodName: methodName,
+        parentScope: superClass.prototype,
+        method: propertyValue,
+        methodName: propertyName,
         args: Array.prototype.slice.call(arguments)
       })
     }

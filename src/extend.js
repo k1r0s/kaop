@@ -4,22 +4,19 @@ module.exports = extend = function(sourceClass, extendedProperties){
 
   var inheritedProperties = {}
 
-  for(var property in sourceClass.prototype){
-    inheritedProperties[property] = sourceClass.prototype[property]
+  for(var propertyName in sourceClass.prototype){
+    inheritedProperties[propertyName] = sourceClass.prototype[propertyName]
   }
 
-  for(var property in extendedProperties){
-    if(typeof extendedProperties[property] === "function" && annotations.getAnnotation(extendedProperties[property].name)){
-      inheritedProperties[property] = annotations.delegate(sourceClass.prototype, property, extendedProperties)
-    }else{
-      inheritedProperties[property] = extendedProperties[property]
-    }
+  for(var propertyName in extendedProperties){
+    extendedProperties[propertyName] = annotations.compile(sourceClass, propertyName, extendedProperties[propertyName])
   }
 
   var extendedClass = function(){
     if(typeof this.constructor === "function") this.constructor.apply(this, arguments)
   }
 
+  extendedClass.rawProperties = extendedProperties
   extendedClass.prototype = inheritedProperties
   return extendedClass
 }
