@@ -9,7 +9,7 @@ module.exports = extend = function(sourceClass, extendedProperties){
   }
 
   for(var propertyName in extendedProperties){
-    extendedProperties[propertyName] = annotations.compile(sourceClass, propertyName, extendedProperties[propertyName])
+    inheritedProperties[propertyName] = annotations.compile(sourceClass, propertyName, extendedProperties[propertyName])
   }
 
   var extendedClass = function(){

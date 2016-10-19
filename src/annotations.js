@@ -36,7 +36,7 @@ module.exports = annotations = {
       return annotatedMethod({
         scope: this,
         parentScope: superClass.prototype,
-        method: propertyValue,
+        method: propertyValue[propertyValue.length - 1],
         methodName: propertyName,
         args: Array.prototype.slice.call(arguments)
       })

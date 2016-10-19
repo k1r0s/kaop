@@ -48,7 +48,7 @@ describe("unit test", function(){
 
     it("annotations::names() should return all the annotation names", function(){
       assert.deepEqual(
-        ['$override', '$twice', '$prop1', '$prop2', '$prop3', '$prop4' ],
+        ['$override', '$prop1', '$prop2', '$prop3', '$prop4' ],
         annotations.names()
       )
     })
