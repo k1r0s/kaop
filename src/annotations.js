@@ -30,12 +30,12 @@ module.exports = annotations = {
     this.next = function(){
       var nextBeforeFn = befores.shift()
       if(nextBeforeFn){
-        nextBeforeFn.call(this, opts)
+        nextBeforeFn.call(this, opts, arguments.callee)
       }
       opts.result = opts.method.apply(opts.scope, opts.args)
       var nextAfterFn = afters.shift()
       if(nextAfterFn){
-        nextAfterFn.call(this, opts)
+        nextAfterFn.call(this, opts, arguments.callee)
       }
     }
   },
@@ -45,9 +45,8 @@ module.exports = annotations = {
       var preparedAnnotation = annotations[i].split(":")
       var annotationFn = this.getAnnotation(preparedAnnotation[0])
       var annotationArguments = preparedAnnotation[1]
-
       if(annotationArguments){
-        eval("(" + annotationFn + ".apply(storeInstance, " + annotationArguments + "))")
+        eval("(" + annotationFn + ".call(storeInstance, " + annotationArguments + "))")
       }else{
         eval("(" + annotationFn + ".call(storeInstance))")
       }

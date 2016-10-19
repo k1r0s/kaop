@@ -1,3 +1,4 @@
+var http = require("http")
 var assert = require("assert")
 var main = require("../index")
 var extend = main.extend
@@ -6,6 +7,8 @@ var annotations = main.annotations
 var Person;
 var Programmer;
 var CoolProgrammer;
+var DataParser;
+
 var normalPerson;
 var normalProgrammer;
 var ciroreed;
@@ -92,4 +95,56 @@ describe("functional testing 2", function(){
     assert.equal("Im running! but... not as faster, coz im fat :/", normalProgrammer.run())
     assert.equal("IM FAST AS HELL!! GET OUT OF MY WAY!", ciroreed.run())
   })
+})
+
+describe("create a new annotation that parses the first parameter that method receives", function(){
+
+  before(function(){
+    annotations.add(function $jsonStringify(param){
+      this.before(function(opts){
+        opts.args[param] = JSON.stringify(opts.args[param])
+        this.next()
+      })
+    })
+  })
+  it("annotation functions can receive parameters to change their behavior", function(){
+    DataParser = extend(function(){}, {
+      serialize: ["$jsonStringify: 0", function(serializedObject){
+        return serializedObject
+      }]
+    })
+    var datap = new DataParser
+    var o = {some: 1, data: {a: "test"}, asd: [{y: 6},{y: "asdasd"},{y: 5}]}
+
+    assert.strictEqual('{"some":1,"data":{"a":"test"},"asd":[{"y":6},{"y":"asdasd"},{"y":5}]}', datap.serialize(o))
+  })
+  it.skip("annotations can run in background", function(done){
+    annotations.add(function $xhrGet(host){
+      this.after(function(opts, next){
+        http.get({
+          host: host
+        }, function(res){
+          var body
+          res.on("data", function(d){ body = body + d});
+          res.on("end", function(){
+            console.log(body)
+            done()
+          });
+
+        })
+      })
+    })
+    DataParser = extend(function(){}, {
+      serialize: ["$jsonStringify: 0", function(serializedObject){
+        return serializedObject
+      }],
+      send: ["$jsonStringify: 0", "$xhrGet: 'google.es'", function(serializedObject){
+        return serializedObject
+      }]
+    })
+    var datap = new DataParser
+    var o = {some: 1, data: {a: "test"}, asd: [{y: 6},{y: "asdasd"},{y: 5}]}
+    assert.strictEqual('{"some":1,"data":{"a":"test"},"asd":[{"y":6},{"y":"asdasd"},{"y":5}]}', datap.send(o))
+  })
+
 })
