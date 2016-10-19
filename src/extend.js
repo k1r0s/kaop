@@ -16,7 +16,6 @@ module.exports = extend = function(sourceClass, extendedProperties){
     if(typeof this.constructor === "function") this.constructor.apply(this, arguments)
   }
 
-  extendedClass.rawProperties = extendedProperties
   extendedClass.prototype = inheritedProperties
   return extendedClass
 }

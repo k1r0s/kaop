@@ -57,4 +57,27 @@ describe("unit test", function(){
       assert.strictEqual("$prop3", annotations.getAnnotation("$prop3").name)
     })
   })
+
+  describe("annotations::getMethodAnnotations()", function(){
+    it("should return the complete list of defined annotations", function(){
+      assert.deepEqual(["$httpGet: 'Person'", "$json"],
+      annotations.getMethodAnnotations(["$httpGet: 'Person'", "$json", function(){  }]))
+      assert.deepEqual(["$override"],
+      annotations.getMethodAnnotations(["$override", function(){  }]))
+    })
+  })
+  describe("annotations::isValidAnnotationArray()", function(){
+    it("should check if the given annotations are declared", function(){
+      assert(annotations.isValidAnnotationArray(["$override", function(){  }]))
+    })
+    it("should return false if the annotations are not declared", function(){
+      assert(!annotations.isValidAnnotationArray(["$httpGet: 'Person'", "$json", function(){  }]))
+    })
+    it("if the annotations are declared it must return true", function(){
+      annotations.add(function $httpGet(){})
+      annotations.add(function $json(){})
+      assert(annotations.isValidAnnotationArray(["$httpGet: 'Person'", "$json", function(){  }]))
+      assert(!annotations.isValidAnnotationArray(["ajdhkasjadh: 'Person'", "$json", function(){  }]))
+    })
+  })
 })

@@ -1,8 +1,10 @@
 module.exports = annotations = {
   arr: [
-    function $override(opts){
-      opts.args.unshift(opts.parentScope[opts.methodName].bind(opts.scope))
-      return opts.method.apply(opts.scope, opts.args)
+    function $override(){
+      this.before(function(opts){
+        opts.args.unshift(opts.parentScope[opts.methodName].bind(opts.scope))
+        this.next()
+      })
     }
   ],
   add: function(ann){
@@ -20,9 +22,42 @@ module.exports = annotations = {
       }
     }
   },
+  Store: function(opts){
+    var befores = []
+    var afters = []
+    this.before = function(fn){ befores.push(fn) }
+    this.after = function(fn){ afters.push(fn) }
+    this.next = function(){
+      var nextBeforeFn = befores.shift()
+      if(nextBeforeFn){
+        nextBeforeFn.call(this, opts)
+      }
+      opts.result = opts.method.apply(opts.scope, opts.args)
+      var nextAfterFn = afters.shift()
+      if(nextAfterFn){
+        nextAfterFn.call(this, opts)
+      }
+    }
+  },
+  fireMethodAnnotations: function(annotations, storeInstance){
+    for (var i = 0; i < annotations.length; i++) {
+
+      var preparedAnnotation = annotations[i].split(":")
+      var annotationFn = this.getAnnotation(preparedAnnotation[0])
+      var annotationArguments = preparedAnnotation[1]
+
+      if(annotationArguments){
+        eval("(" + annotationFn + ".apply(storeInstance, " + annotationArguments + "))")
+      }else{
+        eval("(" + annotationFn + ".call(storeInstance))")
+      }
+    }
+  },
+  getMethodAnnotations: function(array){
+    return array.filter(function(e, index, arr){ return index !== arr.length - 1})
+  },
   isValidAnnotationArray: function(array){
-    return array
-    .filter(function(e, index, arr){ return index !== arr.length - 1})
+    return this.getMethodAnnotations(array)
     .map(function(item){ return item.split(":").shift() })
     .every(this.getAnnotation, this)
   },
@@ -36,16 +71,28 @@ module.exports = annotations = {
       return propertyValue
     }
 
-    var annotatedMethod = this.getAnnotation(propertyValue[0])
+    var selfAnnotations = this
 
     return function(){
-      return annotatedMethod({
+
+      var opts = {
         scope: this,
         parentScope: superClass.prototype,
         method: propertyValue[propertyValue.length - 1],
         methodName: propertyName,
-        args: Array.prototype.slice.call(arguments)
-      })
+        args: Array.prototype.slice.call(arguments),
+        result: undefined
+      }
+
+      var store = new selfAnnotations.Store(opts)
+
+      var methodAnnotations = selfAnnotations.getMethodAnnotations(propertyValue)
+
+      selfAnnotations.fireMethodAnnotations(methodAnnotations, store)
+
+      store.next()
+
+      return opts.result
     }
   }
 }
