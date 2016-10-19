@@ -1,6 +1,6 @@
 ### k-oop
 
-this library is a light package to provide OOP utils save code, enhance code readability, and also provide an alternative to use the lowest JS version with OOP features:
+this library is a light package to provide OOP utils which provides several features such save code, enhance readability, and also provide an alternative to use the lowest JS version with OOP features:
 
 **Extend**
 
@@ -40,14 +40,14 @@ var simplePerson = new Person("Joe", new Date(1990))
 Now we're going to extend `Person` to another subClass called `Programmer`:
 
 ```javascript
-var Programmer = extend(Person, {
-  constructor: function $override(parent, name, dborn, favouriteLanguage){
+Programmer = extend(Person, {
+  constructor: ["$override", function(parent, name, dborn, favouriteLanguage){
     parent(name, dborn)
     this.favLang = favouriteLanguage
-  },
-  run: function $override(parent){
+  }],
+  run: ["$override", function(parent){
     return parent() + " but... not as faster, coz im fat :/"
-  },
+  }],
   code: function(){
     return "Im codding in " + this.favLang
   }
@@ -68,36 +68,41 @@ var annotations = require("k-oop").annotations
 
 Having this one:
 ```javascript
-annotations.add(function $twice(opts){
-  return opts.method() + opts.method()
+annotations.add(function $jsonStringify(param){
+  this.before(function(opts){
+    opts.args[param] = JSON.stringify(opts.args[param])
+    this.next()
+  })
 })
 ```
 And then:
 ```javascript
-var CoolProgrammer = extend(Programmer, {
-  run: function(){
+CoolProgrammer = extend(Programmer, {
+  constructor: ["$override", function(parent, name, dborn, favouriteLanguage){ //method recursive override
+    parent(name, dborn, favouriteLanguage)
+  }],
+  run: function(){ //parent method replacement
     return "IM FAST AS HELL!! GET OUT OF MY WAY!"
   },
-  fly: function $twice(){
-    return "yay drugs! "
-  }
+  serialize: ["$jsonStringify: 0", function(serializedObject){
+    // do stuff
+    // jsonStringify annotation injects the 0 param as string
+    return serializedObject
+  }]
 })
 ```
 > You can only add one annotation per method (this may change in the near future)
 
-Note that in the previous sample there is a `fly` method that has `$twice` annotation...
+Note that in the previous sample there is a `serialize` method that has `$jsonStringify` annotation...
 
 So the following code does this:
 
 ```javascript
 var i = new CoolProgrammer("Ciro", new Date(1990, 8, 22), "Javascript")
-i.fly() //outputs > "yay drugs! yay drugs! "
+i.serialize({some: 1, data: {a: "test"}, asd: [{y: 6},{y: "asdasd"},{y: 5}]}) //outputs '{"some":1,"data":{"a":"test"},"asd":[{"y":6},{"y":"asdasd"},{"y":5}]}' in string..
 ```
 
-the `opts` parameter for the annotation definition has the following properties:
-
-*scope* (opts.scope) this is the current instance/scope where method is executed
-*parentScope* (opts.parentScope) proto is the superClass instance
-*method* (opts.method) otherProperties[methodName] is the method who contains the annotation
-*methodName* (methodName) methodName is the name of the property where the method is evaluated
-*args* (arguments object parsed to native Array)
+#TODO
+- document the framework
+- annotation's scope doesnt care about global variables... :\
+...

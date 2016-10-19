@@ -59,6 +59,9 @@ describe("functional testing 2", function(){
     })
 
     CoolProgrammer = extend(Programmer, {
+      constructor: ["$override", function(parent, name, dborn, favouriteLanguage){
+        parent(name, dborn, favouriteLanguage)
+      }],
       run: function(){
         return "IM FAST AS HELL!! GET OUT OF MY WAY!"
       }
