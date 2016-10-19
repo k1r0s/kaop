@@ -20,12 +20,18 @@ module.exports = annotations = {
       }
     }
   },
+  isValidAnnotationArray: function(array){
+    return array
+    .filter(function(e, index, arr){ return index !== arr.length - 1})
+    .map(function(item){ return item.split(":").shift() })
+    .every(this.getAnnotation, this)
+  },
   compile: function(superClass, propertyName, propertyValue){
     if(!(
       propertyValue &&
       typeof propertyValue.length === "number" &&
       typeof propertyValue[propertyValue.length - 1] === "function" &&
-      propertyValue.filter(function(e, index, arr){ return index !== arr.length - 1}).every(this.getAnnotation, this)
+      this.isValidAnnotationArray(propertyValue)
     )){
       return propertyValue
     }

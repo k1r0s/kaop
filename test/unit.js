@@ -47,10 +47,11 @@ describe("unit test", function(){
     })
 
     it("annotations::names() should return all the annotation names", function(){
-      assert.deepEqual(
-        ['$override', '$prop1', '$prop2', '$prop3', '$prop4' ],
-        annotations.names()
-      )
+      var annotationsArr = annotations.names()
+      assert(annotationsArr.indexOf("$prop2") > -1)
+      assert(annotationsArr.indexOf("$prop1") > -1)
+      assert(annotationsArr.indexOf("$prop3") > -1)
+      assert(annotationsArr.indexOf("$prop4") > -1)
     })
     it("annotations::getAnnotation() should return the annotation function definition", function(){
       assert.strictEqual("$prop3", annotations.getAnnotation("$prop3").name)
