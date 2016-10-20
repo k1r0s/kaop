@@ -4,10 +4,7 @@
   "description": "simple js oop lib helper with classes, inheritance and annotations or method decorators",
   "main": "index.js",
   "scripts": {
-    "test": "mocha",
-    "vminor": "git commit && npm version minor",
-    "vmajor": "git commit && npm version major",
-    "vpatch": "git commit && npm version patch"
+    "test": "mocha"
   },
   "keywords": [
     "framework",
