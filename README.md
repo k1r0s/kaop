@@ -64,7 +64,7 @@ Note that we're using `$override` annotation to get superClass method in the sub
 ```javascript
 var annotations = require("k-oop").annotations
 ```
-`annotations.add(annotationFn)` provides a way to add new features to your app, annotations can modify class methods.
+`annotations.add(function $annotationName(){  ....  })` provides a way to add new features to your app, annotations can modify class methods.
 
 Having this one:
 ```javascript
@@ -91,8 +91,6 @@ CoolProgrammer = extend(Programmer, {
   }]
 })
 ```
-> You can only add one annotation per method (this may change in the near future)
-
 Note that in the previous sample there is a `serialize` method that has `$jsonStringify` annotation...
 
 So the following code does this:
@@ -104,5 +102,5 @@ i.serialize({some: 1, data: {a: "test"}, asd: [{y: 6},{y: "asdasd"},{y: 5}]}) //
 
 #TODO
 - document the framework
-- annotation's scope doesnt care about global variables... :\
+- annotation's scope doesnt care about global variables... :\ (next release may had this feature through adding local variables in `annotations`)
 ...
