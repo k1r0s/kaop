@@ -1,6 +1,6 @@
 {
   "name": "k-oop",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "simple js OOP/AOP lib helper with classes, inheritance and annotations or method decorators (method interceptors)",
   "main": "index.js",
   "scripts": {
