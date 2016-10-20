@@ -1,12 +1,13 @@
 module.exports = annotations = {
   arr: [
     function $override(){
-      this.before(function(opts){
+      this.before(function(opts, next){
         opts.args.unshift(opts.parentScope[opts.methodName].bind(opts.scope))
-        this.next()
+        next()
       })
     }
   ],
+  locals: {},
   add: function(ann){
     this.arr.push(ann)
   },
@@ -39,16 +40,19 @@ module.exports = annotations = {
       }
     }
   },
-  fireMethodAnnotations: function(annotations, storeInstance){
+  fireMethodAnnotations: function(annotations, storeInstance, locals){
     for (var i = 0; i < annotations.length; i++) {
 
       var preparedAnnotation = annotations[i].split(":")
       var annotationFn = this.getAnnotation(preparedAnnotation[0])
       var annotationArguments = preparedAnnotation[1]
-      if(annotationArguments){
-        eval("(" + annotationFn + ".call(storeInstance, " + annotationArguments + "))")
-      }else{
-        eval("(" + annotationFn + ".call(storeInstance))")
+
+      with(locals){
+        if(annotationArguments){
+          eval("(" + annotationFn + ".call(storeInstance, " + annotationArguments + "))")
+        }else{
+          eval("(" + annotationFn + ".call(storeInstance))")
+        }
       }
     }
   },
@@ -87,7 +91,7 @@ module.exports = annotations = {
 
       var methodAnnotations = selfAnnotations.getMethodAnnotations(propertyValue)
 
-      selfAnnotations.fireMethodAnnotations(methodAnnotations, store)
+      selfAnnotations.fireMethodAnnotations(methodAnnotations, store, selfAnnotations.locals)
 
       store.next()
 

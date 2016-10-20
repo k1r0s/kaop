@@ -121,7 +121,9 @@ describe("create a new annotation that parses the first parameter that method re
 
     assert.strictEqual('{"some":1,"data":{"a":"test"},"asd":[{"y":6},{"y":"asdasd"},{"y":5}]}', datap.serialize(o))
   })
-  it.skip("annotations can run in background", function(done){
+  it("annotations can run in background", function(done){
+    annotations.locals.done = done
+    annotations.locals.http = http
     annotations.add(function $xhrGet(host){
       this.after(function(opts, next){
         http.get({
@@ -130,10 +132,8 @@ describe("create a new annotation that parses the first parameter that method re
           var body
           res.on("data", function(d){ body = body + d});
           res.on("end", function(){
-            console.log(body)
             done()
           });
-
         })
       })
     })
