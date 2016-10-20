@@ -1,14 +1,16 @@
 {
   "name": "k-oop",
   "version": "2.2.1",
-  "description": "simple js oop lib helper with classes, inheritance and annotations or method decorators",
+  "description": "simple js OOP/AOP lib helper with classes, inheritance and annotations or method decorators (method interceptors)",
   "main": "index.js",
   "scripts": {
     "test": "mocha"
   },
   "keywords": [
     "framework",
-    "oop"
+    "helper",
+    "oop",
+    "aop"
   ],
   "author": "ciroreed",
   "license": "ISC",
