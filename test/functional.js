@@ -92,6 +92,17 @@ describe("functional testing 2", function() {
     assert.equal("Im codding in Java", normalProgrammer.code());
   });
 
+  it("instance methods should point to its scope, no mather how they get called", function() {
+    var tmpFunction = function(exec) {
+      return exec();
+    };
+
+    assert.equal(26, tmpFunction(normalPerson.getAge));
+    assert.equal(26, tmpFunction(ciroreed.getAge));
+    assert.equal(34, tmpFunction(normalProgrammer.getAge));
+  });
+
+
   it("built in annotation $override should import parent method as first argument", function() {
     assert.equal("Im running!", normalPerson.run());
     assert.equal("Im running! but... not as faster, coz im fat :/", normalProgrammer.run());
