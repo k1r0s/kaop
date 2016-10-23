@@ -37,7 +37,10 @@ module.exports = annotations = {
       if (nextBeforeFn) {
         nextBeforeFn.call(this, opts, arguments.callee);
       }
-      opts.result = opts.method.apply(opts.scope, opts.args);
+      if (!nextBeforeFn && opts.pending) {
+        opts.result = opts.method.apply(opts.scope, opts.args);
+        opts.pending = !opts.pending;
+      }
       var nextAfterFn = afters.shift();
       if (nextAfterFn) {
         nextAfterFn.call(this, opts, arguments.callee);
@@ -92,7 +95,8 @@ module.exports = annotations = {
         method: propertyValue[propertyValue.length - 1],
         methodName: propertyName,
         args: Array.prototype.slice.call(arguments),
-        result: undefined
+        result: undefined,
+        pending: true
       };
 
       var store = new selfAnnotations.Store(opts);

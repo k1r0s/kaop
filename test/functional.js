@@ -134,10 +134,9 @@ describe("create a new annotation that parses the first parameter that method re
     assert.strictEqual('{"some":1,"data":{"a":"test"},"asd":[{"y":6},{"y":"asdasd"},{"y":5}]}', DataParser.serialize(o));
   });
   it("annotations can run in background", function(done) {
-    annotations.locals.done = done;
     annotations.locals.http = http;
     annotations.add(function $xhrGet(host) {
-      this.after(function(opts, next) {
+      this.before(function(opts, next) {
         http.get({
           host: host
         }, function(res) {
@@ -146,33 +145,18 @@ describe("create a new annotation that parses the first parameter that method re
             body = body + d;
           });
           res.on("end", function() {
-            done();
+            opts.args.unshift(body);
+            next();
           });
         });
       });
     });
     DataParser = Class.static({
-      serialize: ["$jsonStringify: 0", function(serializedObject) {
-        return serializedObject;
-      }],
-      send: ["$jsonStringify: 0", "$xhrGet: 'google.es'", function(serializedObject) {
-        return serializedObject;
+      ping: ["$xhrGet: 'google.es'", function(response) {
+        done();
       }]
     });
-    var o = {
-      some: 1,
-      data: {
-        a: "test"
-      },
-      asd: [{
-        y: 6
-      }, {
-        y: "asdasd"
-      }, {
-        y: 5
-      }]
-    };
-    assert.strictEqual('{"some":1,"data":{"a":"test"},"asd":[{"y":6},{"y":"asdasd"},{"y":5}]}', DataParser.send(o));
+    DataParser.ping();
   });
 
 });
