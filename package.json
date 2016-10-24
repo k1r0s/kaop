@@ -1,5 +1,5 @@
 {
-  "name": "k-oop",
+  "name": "kaop",
   "version": "2.2.4",
   "description": "simple js OOP/AOP lib helper with classes, inheritance and annotations or method decorators (method interceptors)",
   "main": "index.js",
