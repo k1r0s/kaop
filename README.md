@@ -1,11 +1,11 @@
-### k-oop
+### kaop
 
 this library is a light package to provide OOP utils which provides several features such save code, enhance readability, and also provide an alternative to use the lowest JS version with OOP features:
 
 **Extend**
 
 ```javascript
-var Class = require("k-oop").Class
+var Class = require("kaop").Class
 ```
 
 -`Class(properties)` is a function which returns a fn constructor that implements defined properties.
@@ -65,7 +65,7 @@ Note that we're using `$override` annotation to get superClass method in the sub
 **Annotations**
 
 ```javascript
-var annotations = require("k-oop").annotations
+var annotations = require("kaop").annotations
 ```
 `annotations.add(function $annotationName(){  ....  })` provides a way to add new features to your app, annotations can modify class methods.
 
