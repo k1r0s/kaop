@@ -171,3 +171,32 @@ describe("create a new annotation that parses the first parameter that method re
   });
 
 });
+
+describe("extending JS native types", function() {
+  var List, listInstance;
+  before(function() {
+    List = Class.inherits(Array, {
+      constructor: ["$override", function(parent) {
+        parent();
+      }],
+      has: function(val) {
+        return this.indexOf(val) > -1;
+      }
+    });
+    listInstance = new List();
+  });
+
+  it("List should inherit Array properties", function() {
+    listInstance.push(3);
+    listInstance.push(1);
+    listInstance.push(5);
+    var result = listInstance.reduce(function(a, b) {
+      return a + b;
+    });
+    assert.strictEqual(result, 9);
+  });
+  it("List should contain a new method called `has`", function() {
+    assert(listInstance.has(3));
+    assert(!listInstance.has(454));
+  });
+});
