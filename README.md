@@ -1,4 +1,7 @@
-### kaop
+# kaop
+
+![Image travis]
+(https://api.travis-ci.org/ciroreed/kaop.svg?branch=master)
 
 this library is a light package to provide OOP utils which provides several features such save code, enhance readability, and also provide an alternative to use the lowest JS version with OOP features:
 
