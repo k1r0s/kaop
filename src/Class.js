@@ -10,12 +10,18 @@ var Class = function(sourceClass, extendedProperties, static) {
 
   if (!static) {
     var extendedClass = function() {
-      for (var propertyName in this) {
-        if (typeof this[propertyName] === "function") {
-          this[propertyName] = this[propertyName].bind(this);
+      try {
+        if (typeof this.constructor === "function") this.constructor.apply(this, arguments);
+
+        for (var propertyName in this) {
+          if (typeof this[propertyName] === "function") {
+            this[propertyName] = this[propertyName].bind(this);
+          }
         }
+
+      } finally {
+        return this;
       }
-      if (typeof this.constructor === "function") return this.constructor.apply(this, arguments);
     };
 
     extendedClass.prototype = inheritedProperties;
