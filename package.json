@@ -4,7 +4,9 @@
   "description": "simple js OOP/AOP lib helper with classes, inheritance and annotations or method decorators (method interceptors)",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "dist": "browserify ./index.js -o ./dist/kaop-lib.dev.js && uglifyjs ./dist/kaop-lib.dev.js --compress --mangle --keep-fnames --output ./dist/kaop-lib.min.js",
+    "prepublish": "npm run dist"
   },
   "keywords": [
     "framework",
@@ -13,6 +15,14 @@
     "aop"
   ],
   "author": "ciroreed",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ciroreed/kaop.git"
+  },
+  "homepage": "https://github.com/ciroreed/kaop",
+  "bugs": {
+    "url": "https://github.com/ciroreed/kaop/issues"
+  },
   "license": "ISC",
   "devDependencies": {
     "mocha": "^3.1.2"
