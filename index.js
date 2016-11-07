@@ -1,7 +1,7 @@
 var Class = require("./src/Class");
 var annotations = require("./src/annotations");
 
-if (typeof module !== "undefined") {
+if (window) {
   window.Class = Class;
   window.annotations = annotations;
 } else {

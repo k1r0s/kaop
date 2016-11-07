@@ -3,13 +3,13 @@ var Class = require("./src/Class");
 var annotations = require("./src/annotations");
 
 if (typeof module !== "undefined") {
+  window.Class = Class;
+  window.annotations = annotations;
+} else {
   module.exports = {
     Class: Class,
     annotations: annotations
   };
-} else {
-  window.Class = Class;
-  window.annotations = annotations;
 }
 
 },{"./src/Class":2,"./src/annotations":3}],2:[function(require,module,exports){
