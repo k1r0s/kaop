@@ -24,11 +24,19 @@ module.exports = annotations = {
     }
   },
   Store: function(opts) {
+    this.isBefore = true;
     var befores = [];
     var afters = [];
     this.before = function(fn) {
       befores.push(fn);
     };
+    this.position = function(fn) {
+      if(this.isBefore){
+        befores.push(fn);
+      }else{
+        afters.push(fn);
+      }
+    },
     this.after = function(fn) {
       afters.push(fn);
     };
@@ -48,8 +56,9 @@ module.exports = annotations = {
     };
   },
   fireMethodAnnotations: function(annotations, storeInstance, locals) {
-    for (var i = 0; i < annotations.length; i++) {
 
+    for (var i = 0; i < annotations.length; i++) {
+      if(typeof annotations[i] === "function"){ storeInstance.isBefore = false; continue; }
       var preparedAnnotation = annotations[i].split(":");
       var annotationFn = this.getAnnotation(preparedAnnotation[0]);
       var annotationArguments = preparedAnnotation[1];
@@ -64,22 +73,27 @@ module.exports = annotations = {
     }
   },
   getMethodAnnotations: function(array) {
-    return array.filter(function(e, index, arr) {
-      return index !== arr.length - 1;
+    return array.filter(function(item) {
+      return typeof item !== "function";
     });
+  },
+  getAnnotatedMethod: function(array){
+    return array.find(function(item) {
+      return typeof item === "function";
+    });
+  },
+  isValidStructure: function(array){
+    return array instanceof Array && array.some(function(item){ return typeof item === "function"; });
   },
   isValidAnnotationArray: function(array) {
     return this.getMethodAnnotations(array)
-      .map(function(item) {
-        return item.split(":").shift();
-      })
+      .map(function(item) { return item.split(":").shift(); })
       .every(this.getAnnotation, this);
   },
   compile: function(superClass, propertyName, propertyValue) {
     if (!(
         propertyValue &&
-        typeof propertyValue.length === "number" &&
-        typeof propertyValue[propertyValue.length - 1] === "function" &&
+        this.isValidStructure(propertyValue) &&
         this.isValidAnnotationArray(propertyValue)
       )) {
       return propertyValue;
@@ -92,7 +106,7 @@ module.exports = annotations = {
       var opts = {
         scope: this,
         parentScope: superClass.prototype,
-        method: propertyValue[propertyValue.length - 1],
+        method: selfAnnotations.getAnnotatedMethod(propertyValue),
         methodName: propertyName,
         args: Array.prototype.slice.call(arguments),
         result: undefined,
@@ -101,9 +115,7 @@ module.exports = annotations = {
 
       var store = new selfAnnotations.Store(opts);
 
-      var methodAnnotations = selfAnnotations.getMethodAnnotations(propertyValue);
-
-      selfAnnotations.fireMethodAnnotations(methodAnnotations, store, selfAnnotations.locals);
+      selfAnnotations.fireMethodAnnotations(propertyValue, store, selfAnnotations.locals);
 
       store.next();
 

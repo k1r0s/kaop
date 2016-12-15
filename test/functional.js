@@ -200,3 +200,46 @@ describe("extending JS native types", function() {
     assert(!listInstance.has(454));
   });
 });
+
+describe("annotations could be placed anywhere in the array definition", function(){
+  var Service;
+  before(function(){
+    annotations.locals.aux = [];
+    annotations.add(function $log() {
+      this.position(function(opts, next) {
+        aux.push("logged");
+        next();
+      });
+    });
+
+    Service = Class.static({
+      operation1: ["$log", function(){
+        annotations.locals.aux.push("operation1");
+      }],
+      operation2: [function(){
+        annotations.locals.aux.push("operation2");
+      }, "$log"]
+    });
+  });
+
+  it("should check if annotations are executed given own position", function(){
+
+    Service.operation1();
+    Service.operation2();
+
+    assert.strictEqual(annotations.locals.aux.join(","), "logged,operation1,operation2,logged");
+  });
+});
+
+describe.skip("multiple inherits", function(){
+  var Human, Ape, Mamal;
+  before(function(){
+    Mamal = Class({
+      isWarmblooded: true
+    })
+
+    Ape = Class({
+
+    })
+  });
+});
