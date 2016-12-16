@@ -1,12 +1,12 @@
 var Class = require("./src/Class");
-var annotations = require("./src/annotations");
+var Annotations = require("./src/Annotations");
 
 if (typeof module === "object") {
-  module.exports = {
-    Class: Class,
-    annotations: annotations
-  };
+    module.exports = {
+        Class: Class,
+        Annotations: Annotations
+    };
 } else {
-  window.Class = Class;
-  window.annotations = annotations;
+    window.Class = Class;
+    window.Annotations = Annotations;
 }
