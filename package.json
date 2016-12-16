@@ -25,6 +25,7 @@
   },
   "license": "ISC",
   "devDependencies": {
-    "mocha": "^3.1.2"
+    "mocha": "^3.1.2",
+    "uglifyjs": "^2.4.10"
   }
 }
