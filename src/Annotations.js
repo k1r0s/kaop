@@ -44,6 +44,7 @@ var Annotations = {
             var nextBeforeFn = befores.shift();
             if (nextBeforeFn) {
                 nextBeforeFn.call(this, opts, arguments.callee);
+                return;
             }
             if (!nextBeforeFn && opts.pending) {
                 opts.result = opts.method.apply(opts.scope, opts.args);

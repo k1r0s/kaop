@@ -164,12 +164,12 @@ var Class = function(sourceClass, extendedProperties, static) {
         var extendedClass = function() {
             try {
                 if (typeof this.constructor === "function") this.constructor.apply(this, arguments);
-            } finally {
                 for (var propertyName in this) {
                     if (typeof this[propertyName] === "function") {
                         this[propertyName] = this[propertyName].bind(this);
                     }
                 }
+            } finally {
                 return this;
             }
         };

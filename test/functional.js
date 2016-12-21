@@ -13,6 +13,38 @@ var normalPerson;
 var normalProgrammer;
 var ciroreed;
 
+Annotations.locals.http = http;
+Annotations.add(function $xhrGet(host) {
+    this.before(function(opts, next) {
+        http.get({
+            host: host
+        }, function(res) {
+            var body;
+            res.on("data", function(d) {
+                body = body + d;
+            });
+            res.on("end", function() {
+                opts.args.unshift(body);
+                next();
+            });
+        });
+    });
+});
+
+Annotations.add(function $processResponse() {
+    this.before(function(opts, next) {
+        opts.args[0] = "something";
+        next();
+    })
+});
+
+Annotations.add(function $executeFn(fnName) {
+    this.after(function(opts, next) {
+        opts.scope[fnName]();
+        next();
+    })
+})
+
 describe("functional testing 1", function() {
     before(function() {
 
@@ -147,24 +179,6 @@ describe("create a new annotation that parses the first parameter that method re
     });
     it("Annotations can run in background", function(done) {
         this.slow(1000);
-
-        Annotations.locals.http = http;
-        Annotations.add(function $xhrGet(host) {
-            this.before(function(opts, next) {
-                http.get({
-                    host: host
-                }, function(res) {
-                    var body;
-                    res.on("data", function(d) {
-                        body = body + d;
-                    });
-                    res.on("end", function() {
-                        opts.args.unshift(body);
-                        next();
-                    });
-                });
-            });
-        });
         DataParser = Class.static({
             ping: ["$xhrGet: 'google.es'", function(response) {
                 done();
@@ -234,15 +248,18 @@ describe("Annotations could be placed anywhere in the array definition", functio
     });
 });
 
-describe.skip("multiple inherits", function() {
-    var Human, Ape, Mamal;
-    before(function() {
-        Mamal = Class({
-            isWarmblooded: true
-        })
+describe("multiple async operations", function() {
+    it("should get google response and then asign to a new variable", function(done) {
+        this.slow(1000);
+        var MyService = Class.static({
+            asyncOperation: ["$xhrGet: 'google.es'", "$processResponse", function(response) {
+                if (response === "something") {
+                    this.fn = done;
+                }
+            }, "$executeFn: 'fn'"]
+        });
 
-        Ape = Class({
+        MyService.asyncOperation();
 
-        })
     });
 });
