@@ -11,7 +11,7 @@ var DataParser;
 
 var normalPerson;
 var normalProgrammer;
-var ciroreed;
+var coolProgrammer;
 
 Decorators.locals.http = http;
 Decorators.locals.aux = [];
@@ -144,27 +144,27 @@ describe("functional testing 2", function() {
 
         normalPerson = new Person("Joe", new Date(1990, 2, 21));
         normalProgrammer = new Programmer("Mike", new Date(1982, 7, 18), "Java");
-        ciroreed = new CoolProgrammer("Ciro", new Date(1990, 8, 22), "Javascript");
+        coolProgrammer = new CoolProgrammer("Ivan", new Date(1990, 8, 22), "Javascript");
     });
 
     it("class instances should be objects with defined properties", function() {
         assert.equal("Joe", normalPerson.name);
         assert.equal("Mike", normalProgrammer.name);
-        assert.equal("Ciro", ciroreed.name);
+        assert.equal("Ivan", coolProgrammer.name);
 
-        assert.notEqual("C#", ciroreed.favLang);
+        assert.notEqual("C#", coolProgrammer.favLang);
     });
 
     it("inner instances should inherit superClass properties", function() {
         assert.equal(27, normalPerson.getAge());
         assert.notEqual(27, normalProgrammer.getAge());
-        assert.equal(27, ciroreed.getAge());
+        assert.equal(27, coolProgrammer.getAge());
 
         assert.throws(function() {
             normalPerson.code();
         }, Error);
 
-        assert.notEqual("Im codding in Java", ciroreed.code());
+        assert.notEqual("Im codding in Java", coolProgrammer.code());
         assert.equal("Im codding in Java", normalProgrammer.code());
     });
 
@@ -174,7 +174,7 @@ describe("functional testing 2", function() {
         };
 
         assert.equal(27, tmpFunction(normalPerson.getAge));
-        assert.equal(27, tmpFunction(ciroreed.getAge));
+        assert.equal(27, tmpFunction(coolProgrammer.getAge));
         assert.equal(35, tmpFunction(normalProgrammer.getAge));
     });
 
@@ -182,7 +182,7 @@ describe("functional testing 2", function() {
     it("built in annotation $override should import parent method as first argument", function() {
         assert.equal("Im running!", normalPerson.run());
         assert.equal("Im running! but... not as faster, coz im fat :/", normalProgrammer.run());
-        assert.equal("IM FAST AS HELL!! GET OUT OF MY WAY!", ciroreed.run());
+        assert.equal("IM FAST AS HELL!! GET OUT OF MY WAY!", coolProgrammer.run());
     });
 });
 
