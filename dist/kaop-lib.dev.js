@@ -1,19 +1,19 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var Class = require("./src/Class");
-var Annotations = require("./src/Annotations");
+var Decorators = require("./src/Decorators");
 
 if (typeof module === "object") {
     module.exports = {
         Class: Class,
-        Annotations: Annotations
+        Decorators: Decorators
     };
 } else {
     window.Class = Class;
-    window.Annotations = Annotations;
+    window.Decorators = Decorators;
 }
 
-},{"./src/Annotations":2,"./src/Class":3}],2:[function(require,module,exports){
-var Annotations = {
+},{"./src/Decorators":2,"./src/Class":3}],2:[function(require,module,exports){
+var Decorators = {
     arr: [
         function $override() {
             this.before(function(opts, next) {
@@ -71,14 +71,14 @@ var Annotations = {
             }
         };
     },
-    fireMethodAnnotations: function(annotations, storeInstance, locals) {
+    fireMethodDecorators: function(Decorators, storeInstance, locals) {
 
-        for (var i = 0; i < annotations.length; i++) {
-            if (typeof annotations[i] === "function") {
+        for (var i = 0; i < Decorators.length; i++) {
+            if (typeof Decorators[i] === "function") {
                 storeInstance.isBefore = false;
                 continue;
             }
-            var preparedAnnotation = annotations[i].split(":");
+            var preparedAnnotation = Decorators[i].split(":");
             var annotationFn = this.getAnnotation(preparedAnnotation[0]);
             var annotationArguments = preparedAnnotation[1];
 
@@ -91,7 +91,7 @@ var Annotations = {
             }
         }
     },
-    getMethodAnnotations: function(array) {
+    getMethodDecorators: function(array) {
         return array.filter(function(item) {
             return typeof item !== "function";
         });
@@ -107,7 +107,7 @@ var Annotations = {
         });
     },
     isValidAnnotationArray: function(array) {
-        return this.getMethodAnnotations(array)
+        return this.getMethodDecorators(array)
             .map(function(item) {
                 return item.split(":")
                     .shift();
@@ -123,23 +123,23 @@ var Annotations = {
             return propertyValue;
         }
 
-        var selfAnnotations = this;
+        var selfDecorators = this;
 
         return function() {
 
             var opts = {
                 scope: this,
                 parentScope: superClass.prototype,
-                method: selfAnnotations.getAnnotatedMethod(propertyValue),
+                method: selfDecorators.getAnnotatedMethod(propertyValue),
                 methodName: propertyName,
                 args: Array.prototype.slice.call(arguments),
                 result: undefined,
                 pending: true
             };
 
-            var store = new selfAnnotations.Store(opts);
+            var store = new selfDecorators.Store(opts);
 
-            selfAnnotations.fireMethodAnnotations(propertyValue, store, selfAnnotations.locals);
+            selfDecorators.fireMethodDecorators(propertyValue, store, selfDecorators.locals);
 
             store.next();
 
@@ -148,17 +148,17 @@ var Annotations = {
     }
 };
 
-module.exports = Annotations;
+module.exports = Decorators;
 
 },{}],3:[function(require,module,exports){
-var annotations = require("./Annotations");
+var Decorators = require("./Decorators");
 
 var Class = function(sourceClass, extendedProperties, static) {
 
     var inheritedProperties = Object.create(sourceClass.prototype);
 
     for (var propertyName in extendedProperties) {
-        inheritedProperties[propertyName] = annotations.compile(sourceClass, propertyName, extendedProperties[propertyName]);
+        inheritedProperties[propertyName] = Decorators.compile(sourceClass, propertyName, extendedProperties[propertyName]);
     }
 
     if (!static) {
@@ -192,4 +192,4 @@ exp.static = function(mainProps) {
 
 module.exports = exp;
 
-},{"./Annotations":2}]},{},[1]);
+},{"./Decorators":2}]},{},[1]);

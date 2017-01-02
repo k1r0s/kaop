@@ -1,4 +1,4 @@
-var Annotations = {
+var Decorators = {
     arr: [
         function $override() {
             this.before(function(opts, next) {
@@ -25,12 +25,23 @@ var Annotations = {
     },
     Store: function(opts) {
         this.isBefore = true;
+        this.last = null;
         var befores = [];
         var afters = [];
+        this.first = function(fn) {
+            this.prepareFirst = function() {
+                befores.unshift(fn);
+            };
+        };
+        this.last = function(fn) {
+            this.prepareLast = function() {
+                afters.push(fn);
+            };
+        };
         this.before = function(fn) {
             befores.push(fn);
         };
-        this.hook = function(fn) {
+        this.place = function(fn) {
             if (this.isBefore) {
                 befores.push(fn);
             } else {
@@ -46,9 +57,9 @@ var Annotations = {
                 nextBeforeFn.call(this, opts, arguments.callee);
                 return;
             }
-            if (!nextBeforeFn && opts.pending) {
+            if (!opts.preventExecution) {
                 opts.result = opts.method.apply(opts.scope, opts.args);
-                opts.pending = !opts.pending;
+                opts.preventExecution = true;
             }
             var nextAfterFn = afters.shift();
             if (nextAfterFn) {
@@ -56,14 +67,14 @@ var Annotations = {
             }
         };
     },
-    fireMethodAnnotations: function(annotations, storeInstance, locals) {
+    fireMethodDecorators: function(Decorators, storeInstance, locals) {
 
-        for (var i = 0; i < annotations.length; i++) {
-            if (typeof annotations[i] === "function") {
+        for (var i = 0; i < Decorators.length; i++) {
+            if (typeof Decorators[i] === "function") {
                 storeInstance.isBefore = false;
                 continue;
             }
-            var preparedAnnotation = annotations[i].split(":");
+            var preparedAnnotation = Decorators[i].split(":");
             var annotationFn = this.getAnnotation(preparedAnnotation[0]);
             var annotationArguments = preparedAnnotation[1];
 
@@ -75,8 +86,14 @@ var Annotations = {
                 }
             }
         }
+        if (typeof storeInstance.prepareFirst === "function") {
+            storeInstance.prepareFirst();
+        }
+        if (typeof storeInstance.prepareLast === "function") {
+            storeInstance.prepareLast();
+        }
     },
-    getMethodAnnotations: function(array) {
+    getMethodDecorators: function(array) {
         return array.filter(function(item) {
             return typeof item !== "function";
         });
@@ -92,7 +109,7 @@ var Annotations = {
         });
     },
     isValidAnnotationArray: function(array) {
-        return this.getMethodAnnotations(array)
+        return this.getMethodDecorators(array)
             .map(function(item) {
                 return item.split(":")
                     .shift();
@@ -108,23 +125,22 @@ var Annotations = {
             return propertyValue;
         }
 
-        var selfAnnotations = this;
+        var selfDecorators = this;
 
         return function() {
 
             var opts = {
                 scope: this,
                 parentScope: superClass.prototype,
-                method: selfAnnotations.getAnnotatedMethod(propertyValue),
+                method: selfDecorators.getAnnotatedMethod(propertyValue),
                 methodName: propertyName,
                 args: Array.prototype.slice.call(arguments),
-                result: undefined,
-                pending: true
+                result: undefined
             };
 
-            var store = new selfAnnotations.Store(opts);
+            var store = new selfDecorators.Store(opts);
 
-            selfAnnotations.fireMethodAnnotations(propertyValue, store, selfAnnotations.locals);
+            selfDecorators.fireMethodDecorators(propertyValue, store, selfDecorators.locals);
 
             store.next();
 
@@ -133,4 +149,4 @@ var Annotations = {
     }
 };
 
-module.exports = Annotations;
+module.exports = Decorators;

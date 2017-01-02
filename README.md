@@ -13,9 +13,9 @@ var Class = require("kaop").Class
 
 -`Class(properties)` is a function which returns a fn constructor that implements defined properties.
 
--`Class.inherits(SuperClass, SubClass properties)` extend the SuperClass properties replacing if they have the same key/name.. we can override methods with the built in annotation `$override` (recursively through upper classes (for sure!)).
+-`Class.inherits(SuperClass, SubClass properties)` extend the SuperClass properties replacing if they have the same key/name.. we can override methods with the built in decorator `$override` (recursively through upper classes (for sure!)).
 
--`Class.static(properties)` returns a plain object with the given properties like plain JavaScript does, we may use this only to use annotations.
+-`Class.static(properties)` returns a plain object with the given properties like plain JavaScript does, we may use this only to use Decorators.
 
 ```javascript
 var Person = Class({
@@ -46,7 +46,7 @@ Now we're going to extend `Person` to another subClass called `Programmer`:
 
 ```javascript
 Programmer = Class.inherits(Person, {
-  // annotation override inject the SuperClass.constructor as the first parameter
+  //decorators override inject the SuperClass.constructor as the first parameter
   constructor: ["$override", function(parent, name, dborn, favouriteLanguage){
     parent(name, dborn) //calling it we can save a lot of code
     this.favLang = favouriteLanguage
@@ -63,18 +63,18 @@ As you may wonder Programmer `constructor` overrides super (or parent) construct
 
 > Note that if you declare a constructor in subClass you must override the parent constructor. If u dont override it, may we receive an unespected behavior (if you dont override it u're just replacing the parent constructor, so it may work, but ... probably is not what you want :|).
 
-Note that we're using `$override` annotation to get superClass method in the subClass method, if we remove the $override from the method we're just replacing the method, so be aware of this!.
+Note that we're using `$override` decorator to get superClass method in the subClass method, if we remove the $override from the method we're just replacing the method, so be aware of this!.
 
-**Annotations**
+**Decorators**
 
 ```javascript
-var annotations = require("kaop").annotations
+var Decorators = require("kaop").Decorators
 ```
-`annotations.add(function $annotationName(){  ....  })` provides a way to add new features to your app, annotations can modify class methods.
+`Decorators.add(function $decoratorName(){  ....  })` provides a way to add new features to your app, Decorators can modify class methods.
 
 Having this one:
 ```javascript
-annotations.add(function $jsonStringify(param){
+Decorators.add(function $jsonStringify(param){
   this.before(function(opts, next){
     opts.args[param] = JSON.stringify(opts.args[param])
     next()
@@ -93,12 +93,12 @@ CoolProgrammer = extend(Programmer, {
   },
   serialize: ["$jsonStringify: 0", function(serializedObject){
     // do stuff
-    // jsonStringify annotation injects the 0 param as string
+    // jsonStringify decorator injects the 0 param as string
     return serializedObject
   }]
 })
 ```
-Note that in the previous sample there is a `serialize` method that has `$jsonStringify` annotation...
+Note that in the previous sample there is a `serialize` method that has `$jsonStringify` decorator...
 
 So the following code does this:
 
@@ -109,14 +109,14 @@ i.serialize({some: 1, data: {a: "test"}, asd: [{y: 6},{y: "asdasd"},{y: 5}]}) //
 
 ### YOLO
 
-As you may wonder annotations support **chained** asynchronous calls because they are callback driven.
+As you may wonder Decorators support **chained** asynchronous calls because they are callback driven.
 
-Multiple annotations for the same method are allowed. You might use hooks inside annotation declaration to control when the annotation will be executed, you can also define multiple hooks in the same annotation:
+Multiple Decorators for the same method are allowed. You might use hooks inside decorator declaration to control when the decorator will be executed, you can also define multiple hooks in the same decorator:
 
-> NOTE! to use custom objects/services (user defined variables) inside annotations you must define it as properties of annotations::locals. IE: var myCoolService = {cool: 'stuff'}; and then you try to use that inside an annotation it will give an reference error unless you do annotations.locals.myCoolService = myCoolService.  
+> NOTE! to use custom objects/services (user defined variables) inside Decorators you must define it as properties of Decorators::locals. IE: var myCoolService = {cool: 'stuff'}; and then you try to use that inside an decorator it will give an reference error unless you do Decorators.locals.myCoolService = myCoolService.  
 
 ```javascript
-annotations.add(function $save(index){
+Decorators.add(function $save(index){
   // hooks
   // this.before(function(opts, next){
   // this.after(function(opts, next){

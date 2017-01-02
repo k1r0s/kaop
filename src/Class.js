@@ -1,11 +1,11 @@
-var annotations = require("./Annotations");
+var Decorators = require("./Decorators");
 
 var Class = function(sourceClass, extendedProperties, static) {
 
     var inheritedProperties = Object.create(sourceClass.prototype);
 
     for (var propertyName in extendedProperties) {
-        inheritedProperties[propertyName] = annotations.compile(sourceClass, propertyName, extendedProperties[propertyName]);
+        inheritedProperties[propertyName] = Decorators.compile(sourceClass, propertyName, extendedProperties[propertyName]);
     }
 
     if (!static) {
