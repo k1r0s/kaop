@@ -3,19 +3,26 @@
 ![Image travis]
 (https://api.travis-ci.org/ciroreed/kaop.svg?branch=master)
 
-this library is a light package to provide OOP utils which provides several features such save code, enhance readability, and also provide an alternative to use the lowest JS version with OOP features:
+This library has a lot of combinations. There are more than 25 examples running at `test` dir... This description try to explain some basic concepts. Advanced users probably will not find too much help about its capabilities.
 
-**Extend**
+Kaop is a light package to provide OOP/AOP patterns, which enables several features such save code, enhance readability, and also provide an alternative to use the lowest JS version (in browsers world) with top features:
+
+## Contents
+
+- [Classes and inheritance](#classes-and-inheritance)
+- [Method decorators](#method-decorators)
+
+### Classes and Inheritance
 
 ```javascript
 var Class = require("kaop").Class
 ```
 
--`Class(properties)` is a function which returns a fn constructor that implements defined properties.
+-`Class(properties)` is a function which returns a fn constructor that implements defined properties as a class definition.
 
--`Class.inherits(SuperClass, SubClass properties)` extend the SuperClass properties replacing if they have the same key/name.. we can override methods with the built in decorator `$override` (recursively through upper classes (for sure!)).
+-`Class.inherits(SuperClass, SubClass properties)` extend the SuperClass properties replacing if they have the same key/name.. we can override methods with the built in decorator `$override` (recursively through upper classes (trust me!)).
 
--`Class.static(properties)` returns a plain object with the given properties like plain JavaScript does, we may use this only to use Decorators.
+-`Class.static(properties)` returns a plain object with the given properties like plain JavaScript does, we may use this only to enable Decorators.
 
 ```javascript
 var Person = Class({
@@ -65,7 +72,7 @@ As you may wonder Programmer `constructor` overrides super (or parent) construct
 
 Note that we're using `$override` decorator to get superClass method in the subClass method, if we remove the $override from the method we're just replacing the method, so be aware of this!.
 
-**Decorators**
+### Method decorators
 
 ```javascript
 var Decorators = require("kaop").Decorators
@@ -74,10 +81,10 @@ var Decorators = require("kaop").Decorators
 
 Having this one:
 ```javascript
-Decorators.add(function $jsonStringify(param){
-  this.before(function(opts, next){
-    opts.args[param] = JSON.stringify(opts.args[param])
-    next()
+Decorators.add(function $jsonStringify(){
+  this.place(function(opts, next){
+    opts.result = JSON.stringify(opts.scope);
+    next();
     //or this.next()
   })
 })
@@ -91,20 +98,21 @@ CoolProgrammer = extend(Programmer, {
   run: function(){ //parent method replacement
     return "IM FAST AS HELL!! GET OUT OF MY WAY!"
   },
-  serialize: ["$jsonStringify: 0", function(serializedObject){
-    // do stuff
-    // jsonStringify decorator injects the 0 param as string
-    return serializedObject
-  }]
+  serialize: [function(){
+      //some stuff
+      //
+      // ...
+  }, "$jsonStringify"]
 })
 ```
-Note that in the previous sample there is a `serialize` method that has `$jsonStringify` decorator...
+Note that in the previous sample there is a `serialize` method that has `$jsonStringify` decorator (placed at the end of the declaration, so it will be executed AFTER method execution)...
 
+> NOTE! decorators could be placed at the beginning or at the end. This is optional because you always can use hooks in decorator declaration. A method can be decorated multiple times and decorators can support multiple hooks within. Anyway you can place decorators at some possition to be more dynamic when declare new classes.
 So the following code does this:
 
 ```javascript
-var i = new CoolProgrammer("Ciro", new Date(1990, 8, 22), "Javascript")
-i.serialize({some: 1, data: {a: "test"}, asd: [{y: 6},{y: "asdasd"},{y: 5}]}) //outputs '{"some":1,"data":{"a":"test"},"asd":[{"y":6},{"y":"asdasd"},{"y":5}]}' in string..
+var coolp = new CoolProgrammer("Jon Doe", new Date(1990, 8, 22), "Javascript")
+coolp.serialize() //outputs a string with the serialized instance..
 ```
 
 ### YOLO
@@ -120,6 +128,9 @@ Decorators.add(function $save(index){
   // hooks
   // this.before(function(opts, next){
   // this.after(function(opts, next){
+  // this.place(function(opts, next){
+  // this.first(function(opts, next){
+  // this.last(function(opts, next){
   this.after(function(opts, next){
     //this method will be executed AFTER the annotated method return it result, so we can
     //perform several actions with it (with the result or what ever is defined in the
@@ -133,8 +144,9 @@ Decorators.add(function $save(index){
     opts.parentScope //gives you access to the parent prototype or.. how `$override` works
     opts.method //it will be executed after all the befores hooks have been consumed
     opts.methodName //the method name string, for tracking purposes.. or any
+    opts.preventExecution //if we asign a truthy value in `before` phase, decorated method will not be called
 
-    // next() //when called, next hook will trigger..
+    next() //MANDATORY call next. When called, next hook or action will trigger..
     // stuff...
 
     // asynchronous example

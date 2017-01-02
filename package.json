@@ -1,7 +1,7 @@
 {
   "name": "kaop",
   "version": "2.5.0",
-  "description": "simple js OOP/AOP lib helper with classes, inheritance and Decorators or method decorators (method interceptors)",
+  "description": "simple js OOP/AOP lib helper with classes, inheritance and method decorators (method interceptors)",
   "main": "index.js",
   "scripts": {
     "test": "mocha",
