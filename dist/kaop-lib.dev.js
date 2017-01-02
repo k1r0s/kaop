@@ -12,7 +12,49 @@ if (typeof module === "object") {
     window.Decorators = Decorators;
 }
 
-},{"./src/Decorators":2,"./src/Class":3}],2:[function(require,module,exports){
+},{"./src/Class":2,"./src/Decorators":3}],2:[function(require,module,exports){
+var Decorators = require("./Decorators");
+
+var Class = function(sourceClass, extendedProperties, static) {
+
+    var inheritedProperties = Object.create(sourceClass.prototype);
+
+    for (var propertyName in extendedProperties) {
+        inheritedProperties[propertyName] = Decorators.compile(sourceClass, propertyName, extendedProperties[propertyName]);
+    }
+
+    if (!static) {
+        var extendedClass = function() {
+            try {
+                if (typeof this.constructor === "function") this.constructor.apply(this, arguments);
+                for (var propertyName in this) {
+                    if (typeof this[propertyName] === "function") {
+                        this[propertyName] = this[propertyName].bind(this);
+                    }
+                }
+            } finally {
+                return this;
+            }
+        };
+
+        extendedClass.prototype = inheritedProperties;
+        return extendedClass;
+    } else {
+        return inheritedProperties;
+    }
+};
+
+var exp = function(mainProps) {
+    return Class(function() {}, mainProps);
+};
+exp.inherits = Class;
+exp.static = function(mainProps) {
+    return Class(function() {}, mainProps, true);
+};
+
+module.exports = exp;
+
+},{"./Decorators":3}],3:[function(require,module,exports){
 var Decorators = {
     arr: [
         function $override() {
@@ -40,12 +82,23 @@ var Decorators = {
     },
     Store: function(opts) {
         this.isBefore = true;
+        this.last = null;
         var befores = [];
         var afters = [];
+        this.first = function(fn) {
+            this.prepareFirst = function() {
+                befores.unshift(fn);
+            };
+        };
+        this.last = function(fn) {
+            this.prepareLast = function() {
+                afters.push(fn);
+            };
+        };
         this.before = function(fn) {
             befores.push(fn);
         };
-        this.hook = function(fn) {
+        this.place = function(fn) {
             if (this.isBefore) {
                 befores.push(fn);
             } else {
@@ -61,9 +114,9 @@ var Decorators = {
                 nextBeforeFn.call(this, opts, arguments.callee);
                 return;
             }
-            if (!nextBeforeFn && opts.pending) {
+            if (!opts.preventExecution) {
                 opts.result = opts.method.apply(opts.scope, opts.args);
-                opts.pending = !opts.pending;
+                opts.preventExecution = true;
             }
             var nextAfterFn = afters.shift();
             if (nextAfterFn) {
@@ -89,6 +142,12 @@ var Decorators = {
                     eval("(" + annotationFn + ".call(storeInstance))");
                 }
             }
+        }
+        if (typeof storeInstance.prepareFirst === "function") {
+            storeInstance.prepareFirst();
+        }
+        if (typeof storeInstance.prepareLast === "function") {
+            storeInstance.prepareLast();
         }
     },
     getMethodDecorators: function(array) {
@@ -133,8 +192,7 @@ var Decorators = {
                 method: selfDecorators.getAnnotatedMethod(propertyValue),
                 methodName: propertyName,
                 args: Array.prototype.slice.call(arguments),
-                result: undefined,
-                pending: true
+                result: undefined
             };
 
             var store = new selfDecorators.Store(opts);
@@ -150,46 +208,4 @@ var Decorators = {
 
 module.exports = Decorators;
 
-},{}],3:[function(require,module,exports){
-var Decorators = require("./Decorators");
-
-var Class = function(sourceClass, extendedProperties, static) {
-
-    var inheritedProperties = Object.create(sourceClass.prototype);
-
-    for (var propertyName in extendedProperties) {
-        inheritedProperties[propertyName] = Decorators.compile(sourceClass, propertyName, extendedProperties[propertyName]);
-    }
-
-    if (!static) {
-        var extendedClass = function() {
-            try {
-                if (typeof this.constructor === "function") this.constructor.apply(this, arguments);
-                for (var propertyName in this) {
-                    if (typeof this[propertyName] === "function") {
-                        this[propertyName] = this[propertyName].bind(this);
-                    }
-                }
-            } finally {
-                return this;
-            }
-        };
-
-        extendedClass.prototype = inheritedProperties;
-        return extendedClass;
-    } else {
-        return inheritedProperties;
-    }
-};
-
-var exp = function(mainProps) {
-    return Class(function() {}, mainProps);
-};
-exp.inherits = Class;
-exp.static = function(mainProps) {
-    return Class(function() {}, mainProps, true);
-};
-
-module.exports = exp;
-
-},{"./Decorators":2}]},{},[1]);
+},{}]},{},[1]);
