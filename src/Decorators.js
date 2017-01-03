@@ -1,6 +1,6 @@
 var Decorators = {
     arr: [
-        function $override() {
+        function override() {
             this.before(function(opts, next) {
                 opts.args.unshift(opts.parentScope[opts.methodName].bind(opts.scope));
                 next();
@@ -18,7 +18,7 @@ var Decorators = {
     },
     getAnnotation: function(annotationName) {
         for (var i = 0; i < this.arr.length; i++) {
-            if (this.arr[i].name === annotationName) {
+            if (this.arr[i].name === annotationName.replace("@", "")) {
                 return this.arr[i];
             }
         }

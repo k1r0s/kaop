@@ -27,11 +27,11 @@ describe("Decorators::compile()", function() {
     })
 
     it("propertyValue is an array that contains a function in the last slot, it should return the annotatedFunction", function() {
-        assert(typeof Decorators.compile(undefined, undefined, ["$override", function() {}]) === "function")
+        assert(typeof Decorators.compile(undefined, undefined, ["@override", function() {}]) === "function")
     })
 
     it("propertyValue is an array that contains a function in the last slot, it should return the annotatedFunction", function() {
-        assert(typeof Decorators.compile(undefined, undefined, [function() {}, "$override"]) === "function")
+        assert(typeof Decorators.compile(undefined, undefined, [function() {}, "@override"]) === "function")
     })
 
     it("if contains any annotation that was not added yet to the Decorators pool, it should return the array instead", function() {
@@ -42,48 +42,41 @@ describe("Decorators::compile()", function() {
 describe("Decorators::add, ::names, ::getAnnotation", function() {
 
     before(function() {
-        Decorators.add(function $prop1() {})
-        Decorators.add(function $prop2() {})
-        Decorators.add(function $prop3() {})
-        Decorators.add(function $prop4() {})
+        Decorators.add(function prop1() {})
+        Decorators.add(function prop2() {})
+        Decorators.add(function prop3() {})
+        Decorators.add(function prop4() {})
     })
 
-    it("Decorators::names() should return all the annotation names", function() {
-        var DecoratorsArr = Decorators.names()
-        assert(DecoratorsArr.indexOf("$prop2") > -1)
-        assert(DecoratorsArr.indexOf("$prop1") > -1)
-        assert(DecoratorsArr.indexOf("$prop3") > -1)
-        assert(DecoratorsArr.indexOf("$prop4") > -1)
-    })
     it("Decorators::getAnnotation() should return the annotation function definition", function() {
-        assert.strictEqual("$prop3", Decorators.getAnnotation("$prop3")
+        assert.strictEqual("prop3", Decorators.getAnnotation("@prop3")
             .name)
     })
 })
 
 describe("Decorators::getMethodDecorators()", function() {
     it("should return the complete list of defined Decorators", function() {
-        assert.deepEqual(["$httpGet: 'Person'", "$json"],
-            Decorators.getMethodDecorators(["$httpGet: 'Person'", "$json", function() {}]))
+        assert.deepEqual(["@httpGet: 'Person'", "@json"],
+            Decorators.getMethodDecorators(["@httpGet: 'Person'", "@json", function() {}]))
         assert.deepEqual(["$httpGet: 'Person'", "$json"],
             Decorators.getMethodDecorators(["$httpGet: 'Person'", function() {}, "$json"]))
-        assert.deepEqual(["$httpGet: 'Person'", "$json"],
-            Decorators.getMethodDecorators([function() {}, "$httpGet: 'Person'", "$json"]))
-        assert.deepEqual(["$override"],
-            Decorators.getMethodDecorators(["$override", function() {}]))
+        assert.deepEqual(["_httpGet: 'Person'", "_json"],
+            Decorators.getMethodDecorators([function() {}, "_httpGet: 'Person'", "_json"]))
+        assert.deepEqual(["&override"],
+            Decorators.getMethodDecorators(["&override", function() {}]))
     })
 })
 describe("Decorators::isValidAnnotationArray()", function() {
     it("should check if the given Decorators are declared", function() {
-        assert(Decorators.isValidAnnotationArray(["$override", function() {}]))
+        assert(Decorators.isValidAnnotationArray(["@override", function() {}]))
     })
     it("should return false if the Decorators are not declared", function() {
         assert(!Decorators.isValidAnnotationArray(["$httpGet: 'Person'", "$json", function() {}]))
     })
     it("if the Decorators are declared it must return true", function() {
-        Decorators.add(function $httpGet() {})
-        Decorators.add(function $json() {})
-        assert(Decorators.isValidAnnotationArray(["$httpGet: 'Person'", "$json", function() {}]))
-        assert(!Decorators.isValidAnnotationArray(["ajdhkasjadh: 'Person'", "$json", function() {}]))
+        Decorators.add(function httpGet() {})
+        Decorators.add(function json() {})
+        assert(Decorators.isValidAnnotationArray(["@httpGet: 'Person'", "@json", function() {}]))
+        assert(!Decorators.isValidAnnotationArray(["ajdhkasjadh: 'Person'", "@json", function() {}]))
     })
 })

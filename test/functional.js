@@ -16,7 +16,7 @@ var coolProgrammer;
 Decorators.locals.http = http;
 Decorators.locals.aux = [];
 
-Decorators.add(function $xhrGet(host) {
+Decorators.add(function xhrGet(host) {
     this.before(function(opts, next) {
         http.get({
             host: host
@@ -33,7 +33,7 @@ Decorators.add(function $xhrGet(host) {
     });
 });
 
-Decorators.add(function $log() {
+Decorators.add(function log() {
     this.place(function(opts, next) {
         aux.push("logged");
         next();
@@ -41,28 +41,28 @@ Decorators.add(function $log() {
 });
 
 
-Decorators.add(function $processResponse() {
+Decorators.add(function processResponse() {
     this.before(function(opts, next) {
         opts.args[0] = "something";
         next();
     })
 });
 
-Decorators.add(function $executeFn(fnName) {
+Decorators.add(function executeFn(fnName) {
     this.after(function(opts, next) {
         opts.scope[fnName]();
         next();
     })
 });
 
-Decorators.add(function $jsonStringify(param) {
+Decorators.add(function jsonStringify(param) {
     this.before(function(opts, next) {
         opts.args[param] = JSON.stringify(opts.args[param]);
         next();
     });
 });
 
-Decorators.add(function $tryReferenceError() {
+Decorators.add(function tryReferenceError() {
     this.before(function(opts, next) {
         opts.preventExecution = true;
         opts.result = [];
@@ -81,7 +81,7 @@ Decorators.add(function $tryReferenceError() {
     });
 });
 
-Decorators.add(function $appendResult() {
+Decorators.add(function appendResult() {
     this.after(function(opts, next) {
         opts.result.push("append...");
         next();
@@ -121,11 +121,11 @@ describe("functional testing 2", function() {
 
     before(function() {
         Programmer = Class.inherits(Person, {
-            constructor: ["$override", function(parent, name, dborn, favouriteLanguage) {
+            constructor: ["@override", function(parent, name, dborn, favouriteLanguage) {
                 parent(name, dborn);
                 this.favLang = favouriteLanguage;
             }],
-            run: ["$override", function(parent) {
+            run: ["@override", function(parent) {
                 return parent() + " but... not as faster, coz im fat :/";
             }],
             code: function() {
@@ -134,7 +134,7 @@ describe("functional testing 2", function() {
         });
 
         CoolProgrammer = Class.inherits(Programmer, {
-            constructor: ["$override", function(parent, name, dborn, favouriteLanguage) {
+            constructor: ["@override", function(parent, name, dborn, favouriteLanguage) {
                 parent(name, dborn, favouriteLanguage);
             }],
             run: function() {
@@ -179,7 +179,7 @@ describe("functional testing 2", function() {
     });
 
 
-    it("built in annotation $override should import parent method as first argument", function() {
+    it("built in annotation @override should import parent method as first argument", function() {
         assert.equal("Im running!", normalPerson.run());
         assert.equal("Im running! but... not as faster, coz im fat :/", normalProgrammer.run());
         assert.equal("IM FAST AS HELL!! GET OUT OF MY WAY!", coolProgrammer.run());
@@ -190,7 +190,7 @@ describe("create a new annotation that parses the first parameter that method re
 
     it("annotation functions can receive parameters to change their behavior", function() {
         DataParser = Class.static({
-            serialize: ["$jsonStringify: 0", function(serializedObject) {
+            serialize: ["@jsonStringify: 0", function(serializedObject) {
                 return serializedObject;
             }]
         });
@@ -214,7 +214,7 @@ describe("create a new annotation that parses the first parameter that method re
     it("Decorators can run in background", function(done) {
         this.slow(1000);
         DataParser = Class.static({
-            ping: ["$xhrGet: 'google.es'", function(response) {
+            ping: ["@xhrGet: 'google.es'", function(response) {
                 done();
             }]
         });
@@ -227,7 +227,7 @@ describe("extending JS native types", function() {
     var List, listInstance;
     before(function() {
         List = Class.inherits(Array, {
-            constructor: ["$override", function(parent) {
+            constructor: ["@override", function(parent) {
                 parent();
             }],
             has: function(val) {
@@ -256,12 +256,12 @@ describe("Decorators could be placed anywhere in the array definition", function
     var Service;
     before(function() {
         Service = Class.static({
-            operation1: ["$log", function() {
+            operation1: ["@log", function() {
                 Decorators.locals.aux.push("operation1");
             }],
             operation2: [function() {
                 Decorators.locals.aux.push("operation2");
-            }, "$log"]
+            }, "@log"]
         });
     });
 
@@ -279,10 +279,10 @@ describe("Hooks `first` and `last`, flow control", function() {
     var Service;
     before(function() {
         Service = Class.static({
-            myMethod: ["$tryReferenceError", function(fnName) {
+            myMethod: ["@tryReferenceError", function(fnName) {
                 function aFunctionWhoDoesNothing() {}
                 return eval(fnName + "()");
-            }, "$appendResult"]
+            }, "@appendResult"]
         })
     });
 
@@ -298,11 +298,11 @@ describe("multiple async operations", function() {
     it("should get google response and then asign to a new variable", function(done) {
         this.slow(1000);
         var MyService = Class.static({
-            asyncOperation: ["$xhrGet: 'google.es'", "$processResponse", function(response) {
+            asyncOperation: ["@xhrGet: 'google.es'", "@processResponse", function(response) {
                 if (response === "something") {
                     this.fn = done;
                 }
-            }, "$executeFn: 'fn'"]
+            }, "@executeFn: 'fn'"]
         });
 
         MyService.asyncOperation();
