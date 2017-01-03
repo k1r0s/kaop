@@ -66,15 +66,18 @@ Decorators.add(function serialize() {
 
 /**
  * @decorator - @function serialize
- * this decorator can only used in classes or subclasses which
- * inherits ExampleModel class.
+ * this decorator may only used in classes or subclasses which
+ * inherits ExampleModel class (this condition is not
+ * implemented yet).
+ *
+ * !opts.scope instanceof ExampleModel
  */
 
 Decorators.add(function triggerChange() {
     // `place` function consider decorator position in the class
     // property declaration.
     this.place(function(opts, next) {
-        if (!opts.result || !opts.scope instanceof ExampleModel) {
+        if (!opts.result) {
             next();
             return;
         }
