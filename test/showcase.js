@@ -74,7 +74,7 @@ Decorators.add(function triggerChange() {
     // `place` function consider decorator position in the class
     // property declaration.
     this.place(function(opts, next) {
-        if (!opts.result || !scope.opts instanceof ExampleModel) {
+        if (!opts.result || !opts.scope instanceof ExampleModel) {
             next();
             return;
         }
