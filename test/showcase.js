@@ -64,36 +64,21 @@ Decorators.add(function serialize() {
     });
 });
 
+
 /**
- * @decorator - @function serialize
- * this decorator may only used in classes or subclasses which
- * inherits ExampleModel class (this condition is not
- * implemented yet).
- *
- * !opts.scope instanceof ExampleModel
+ * defer - description
+ * defer the execution of a method of the targeted instance
+ * @param  {string} nameContext method to be executed
  */
 
-Decorators.add(function triggerChange() {
-    // `place` function consider decorator position in the class
-    // property declaration.
+Decorators.add(function defer(nameContext) {
     this.place(function(opts, next) {
-        if (!opts.result) {
-            next();
-            return;
+        with(opts.scope) {
+            eval(nameContext + "(opts.methodName)");
         }
-
-        // here we can access to the targeted instance to perform
-        // several actions. Simply we iterate for attached actions
-        // to execute appertained handler.
-        opts.scope.actionsPool.forEach(function(action) {
-            if (action.id === opts.methodName) {
-                action.fn.call(opts.scope);
-            }
-        })
         next();
     });
-});
-
+})
 
 /**
  * @class ExampleModel
@@ -145,6 +130,20 @@ var ExampleModel = Class({
         });
     },
 
+
+    /**
+     * fire - description
+     * this method triggers the associated callbacks
+     * @param  {type} actionName key which determine callbacks
+     */
+    fire: function(actionName) {
+        this.actionsPool.forEach(function(action) {
+            if (action.id === actionName) {
+                action.fn();
+            }
+        })
+    },
+
     /**
      * @function set - description
      * sets a value associated with a key property
@@ -158,7 +157,7 @@ var ExampleModel = Class({
             this.attributes[key] = value;
             return true;
         }
-    }, "@serialize", "@save", "@triggerChange"],
+    }, "@serialize", "@save", "@defer: 'fire'"],
 
     /**
      * @function get - description
