@@ -68,17 +68,16 @@ Decorators.add(function serialize() {
 /**
  * defer - description
  * defer the execution of a method of the targeted instance
+ * at the right timming
  * @param  {string} nameContext method to be executed
  */
 
 Decorators.add(function defer(nameContext) {
     this.place(function(opts, next) {
-        with(opts.scope) {
-            eval(nameContext + "(opts.methodName)");
-        }
+        eval("opts.scope." + nameContext + "(opts.methodName)");
         next();
     });
-})
+});
 
 /**
  * @class ExampleModel
