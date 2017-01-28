@@ -27,37 +27,45 @@ describe("Decorators::compile()", function() {
     });
 
     it("propertyValue is an array that contains a function in the last slot, it should return the annotatedFunction", function() {
-        assert(typeof Decorators.compile(undefined, undefined, ["@override", function() {}]) === "function");
+        assert(typeof Decorators.compile(undefined, undefined, ["override", function() {}]) === "function");
     });
 
     it("propertyValue is an array that contains a function in the last slot, it should return the annotatedFunction", function() {
-        assert(typeof Decorators.compile(undefined, undefined, [function() {}, "@override"]) === "function");
+        assert(typeof Decorators.compile(undefined, undefined, [function() {}, "override"]) === "function");
     });
 
     it("if contains any annotation that was not added yet to the Decorators pool, it should return the array instead", function() {
         assert(typeof Decorators.compile(undefined, undefined, ["$annotationThatNotExists", function() {}]) !== "function");
     });
-})
+});
 
 describe("Decorators::add, ::names, ::getDecoratorFn", function() {
 
     before(function() {
-        Decorators.add(function prop1() {});
-        Decorators.add(function prop2() {});
-        Decorators.add(function prop3() {});
-        Decorators.add(function prop4() {});
+        Decorators.add({
+            decorator: function prop1() {}
+        });
+        Decorators.add({
+            decorator: function prop2() {}
+        });
+        Decorators.add({
+            decorator: function prop3() {}
+        });
+        Decorators.add({
+            decorator: function prop4() {}
+        });
     });
 
     it("Decorators::getDecoratorFn() should return the annotation function definition", function() {
-        assert.strictEqual("prop3", Decorators.getDecoratorFn("@prop3")
+        assert.strictEqual("prop3", Decorators.getDecoratorFn("prop3").decorator
             .name);
     });
 });
 
 describe("Decorators::getMethodDecorators()", function() {
     it("should return the complete list of defined Decorators", function() {
-        assert.deepEqual(["@httpGet: 'Person'", "@json"],
-            Decorators.getMethodDecorators(["@httpGet: 'Person'", "@json", function() {}]));
+        assert.deepEqual(["httpGet: 'Person'", "json"],
+            Decorators.getMethodDecorators(["httpGet: 'Person'", "json", function() {}]));
         assert.deepEqual(["$httpGet: 'Person'", "$json"],
             Decorators.getMethodDecorators(["$httpGet: 'Person'", function() {}, "$json"]));
         assert.deepEqual(["_httpGet: 'Person'", "_json"],
@@ -68,16 +76,20 @@ describe("Decorators::getMethodDecorators()", function() {
 });
 describe("Decorators::isValidAnnotationArray()", function() {
     it("should check if the given Decorators are declared", function() {
-        assert(Decorators.isValidAnnotationArray(["@override", function() {}]));
+        assert(Decorators.isValidAnnotationArray(["override", function() {}]));
     });
     it("should return false if the Decorators are not declared", function() {
         assert(!Decorators.isValidAnnotationArray(["$httpGet: 'Person'", "$json", function() {}]));
     });
     it("if the Decorators are declared it must return true", function() {
-        Decorators.add(function httpGet() {});
-        Decorators.add(function json() {});
-        assert(Decorators.isValidAnnotationArray(["@httpGet: 'Person'", "@json", function() {}]));
-        assert(!Decorators.isValidAnnotationArray(["ajdhkasjadh: 'Person'", "@json", function() {}]));
+        Decorators.add({
+            decorator: function httpGet() {}
+        });
+        Decorators.add({
+            decorator: function json() {}
+        });
+        assert(Decorators.isValidAnnotationArray(["httpGet: 'Person'", "json", function() {}]));
+        assert(!Decorators.isValidAnnotationArray(["ajdhkasjadh: 'Person'", "json", function() {}]));
     });
 });
 
@@ -89,5 +101,13 @@ describe("Decorators::transpileMethod", function() {
         Decorators.transpileMethod(function() {
             next();
         }, {}, done)();
+    });
+    it("second parameter is the `meta` key word, should be available in the method scope", function(done) {
+        Decorators.transpileMethod(function() {
+            console.log(meta);
+        }, {
+            a: 2,
+            v: "patata"
+        }, done)();
     });
 });

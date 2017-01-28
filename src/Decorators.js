@@ -1,48 +1,15 @@
-var Decorators = {
-    arr: [
-        function override() {
-            meta.args.unshift(meta.parentScope[meta.methodName].bind(this));
-        }
-    ],
+var Phase = require("./Phase");
+
+module.exports = Decorators = {
+    arr: [],
     locals: {},
-    add: function(ann) {
-        Decorators.arr.push(ann);
+    add: function(def) {
+        Decorators.arr.push(def);
     },
-    names: function() {
-        return Decorators.arr.map(function(fn) {
-            return fn.name;
+    decoratorNames: function() {
+        return Decorators.arr.map(function(dec) {
+            return dec.decorator.name;
         });
-    },
-    getDecoratorFn: function(annotationName) {
-        for (var i = 0; i < Decorators.arr.length; i++) {
-            if (Decorators.arr[i].name === annotationName.replace("@", "")) {
-                return Decorators.arr[i];
-            }
-        }
-    },
-    Store: function(opts, propertyDeclaration) {
-        var index = 0;
-        this.next = function() {
-            var currentStep = propertyDeclaration[index];
-            if (typeof currentStep === "function") {
-                opts.result = currentStep.apply(opts.scope, opts.args);
-            } else if (typeof currentStep === "string") {
-                var stepProperties = currentStep.split(":");
-                var stepFunctionName = stepProperties[0];
-                var stepArguments = stepProperties[1];
-                var rawDecorator = Decorators.getDecoratorFn(stepFunctionName);
-                var decoratedMethod;
-                decoratedMethod = Decorators.transpileMethod(rawDecorator, opts, arguments.callee);
-                with(Decorators.locals) {
-                    if (stepArguments) {
-                        eval("(" + decoratedMethod + ".call(opts.scope, " + stepArguments + "))");
-                    } else {
-                        eval("(" + decoratedMethod + ".call(opts.scope))");
-                    }
-                }
-            }
-            index++;
-        };
     },
     transpileMethod: function(method, meta, next) {
         var methodToString = method.toString();
@@ -50,7 +17,7 @@ var Decorators = {
             .substring(methodToString.indexOf("{") + 1, methodToString.lastIndexOf("}"));
 
         if (!methodDeclaration.match(/[^a-zA-Z_$]next[^a-zA-Z_$0-9]/g)) {
-            methodDeclaration += "\nnext();"
+            methodDeclaration += "\nnext();";
         }
         return eval("(function(){ " + methodDeclaration + " })");
     },
@@ -69,6 +36,11 @@ var Decorators = {
             return typeof item === "function";
         });
     },
+    getDecoratorFn: function(fname) {
+        return Decorators.arr.find(function(dec) {
+            return dec.decorator.name === fname;
+        });
+    },
     isValidAnnotationArray: function(array) {
         return Decorators.getMethodDecorators(array)
             .map(function(item) {
@@ -76,6 +48,13 @@ var Decorators = {
                     .shift();
             })
             .every(Decorators.getDecoratorFn, Decorators);
+    },
+    fireMethod: function(methodDefinitionArray, props, phase) {
+        if (phase === Phase.EVALUATION) {
+
+        } else if (phase === Phase.RUNTIME) {
+
+        }
     },
     compile: function(superClass, propertyName, propertyValue) {
         if (!(
@@ -86,26 +65,27 @@ var Decorators = {
             return propertyValue;
         }
 
-        var selfDecorators = this;
+        var evaluationProps = {
+            method: Decorators.getDecoratedMethod(propertyValue),
+            methodName: propertyName
+        };
+
+        Decorators.fireMethod(propertyValue, evaluationProps, Phase.EVALUATION);
 
         return function() {
 
-            var opts = {
+            var runtimeProps = {
+                method: evaluationProps.method,
+                methodName: evaluationProps.methodName,
                 scope: this,
                 parentScope: superClass.prototype,
-                method: selfDecorators.getDecoratedMethod(propertyValue),
-                methodName: propertyName,
                 args: Array.prototype.slice.call(arguments),
                 result: undefined
             };
 
-            var store = new selfDecorators.Store(opts, propertyValue);
+            Decorators.fireMethod(propertyValue, runtimeProps, Phase.RUNTIME);
 
-            store.next();
-
-            return opts.result;
+            return runtimeProps.result;
         };
     }
 };
-
-module.exports = Decorators;

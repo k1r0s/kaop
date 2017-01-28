@@ -16,7 +16,7 @@ var Decorators = main.Decorators;
 Decorators.locals.myCoolService = $$myCoolService = 1;
 
 /**
- * @decorator - @function sendResult
+ * decorator - function sendResult
  * this decorator send an API request
  * related with the targeted class instance
  */
@@ -45,7 +45,7 @@ Decorators.add(function save() {
 
 
 /**
- * @decorator - @function serialize
+ * decorator - function serialize
  * this decorator serializes the targeted instance
  */
 
@@ -69,7 +69,7 @@ Decorators.add(function serialize() {
  * defer - description
  * defer the execution of a method of the targeted instance
  * at the right timming
- * @param  {string} nameContext method to be executed
+ * param  {string} nameContext method to be executed
  */
 
 Decorators.add(function defer(nameContext) {
@@ -80,23 +80,23 @@ Decorators.add(function defer(nameContext) {
 });
 
 /**
- * @class ExampleModel
+ * class ExampleModel
  */
 var ExampleModel = Class({
 
     /**
-     * @property actionsPool
+     * property actionsPool
      * contains an array with the attached operations
      */
     actionsPool: null,
 
     /**
-     * @property attributes
+     * property attributes
      * contains the properties pair value
      */
     attributes: null,
     /**
-     * @function constructor
+     * function constructor
      *
      */
     constructor: function() {
@@ -105,22 +105,22 @@ var ExampleModel = Class({
     },
 
     /**
-     * @function url
+     * function url
      * returns the path where request are made to interact
      * with this resource
      *
-     * @return {string} api url
+     * return {string} api url
      */
     url: function() {
         return "/ExampleModel/" + (this.id || "");
     },
 
     /**
-     * @function on - description
+     * function on - description
      * attaches a function handler to be executed when
      * another method is executed
-     * @param {string} action the method name we're waiting for
-     * @param {function} handler the function to be executed
+     * param {string} action the method name we're waiting for
+     * param {function} handler the function to be executed
      */
     on: function(action, handler) {
         this.actionsPool.push({
@@ -133,7 +133,7 @@ var ExampleModel = Class({
     /**
      * fire - description
      * this method triggers the associated callbacks
-     * @param  {type} actionName key which determine callbacks
+     * param  {type} actionName key which determine callbacks
      */
     fire: function(actionName) {
         this.actionsPool.forEach(function(action) {
@@ -144,25 +144,25 @@ var ExampleModel = Class({
     },
 
     /**
-     * @function set - description
+     * function set - description
      * sets a value associated with a key property
-     * @param {string} key the unique id of that property
-     * @param {any} value
+     * param {string} key the unique id of that property
+     * param {any} value
      *
-     * @decorators @serialize, @save, @triggerChange
+     * decorators serialize, save, triggerChange
      */
     set: [function(key, value) {
         if (this.attributes[key] !== value) {
             this.attributes[key] = value;
             return true;
         }
-    }, "@serialize", "@save", "@defer: 'fire'"],
+    }, "serialize", "save", "defer: 'fire'"],
 
     /**
-     * @function get - description
+     * function get - description
      * retrieves the attribute value of the given key
-     * @param {string} key , the name of the attribute
-     * @return {any} value of the property
+     * param {string} key , the name of the attribute
+     * return {any} value of the property
      */
     get: function(key) {
         return this.attributes[key];
