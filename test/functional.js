@@ -34,32 +34,20 @@ Decorators.add(function xhrGet(host) {
 });
 
 Decorators.add(function log() {
-    this.place(function(opts, next) {
-        aux.push("logged");
-        next();
-    });
+    aux.push("logged");
 });
 
 
 Decorators.add(function processResponse() {
-    this.before(function(opts, next) {
-        opts.args[0] = "something";
-        next();
-    })
+    opts.args[0] = "something";
 });
 
 Decorators.add(function executeFn(fnName) {
-    this.after(function(opts, next) {
-        opts.scope[fnName]();
-        next();
-    })
+    opts.scope[fnName]();
 });
 
 Decorators.add(function jsonStringify(param) {
-    this.before(function(opts, next) {
-        opts.args[param] = JSON.stringify(opts.args[param]);
-        next();
-    });
+    opts.args[param] = JSON.stringify(opts.args[param]);
 });
 
 Decorators.add(function tryReferenceError() {
@@ -274,7 +262,7 @@ describe("Decorators could be placed anywhere in the array definition", function
     });
 });
 
-describe("Hooks `first` and `last`, flow control", function() {
+describe.skip("Hooks `first` and `last`, flow control", function() {
 
     var Service;
     before(function() {

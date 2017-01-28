@@ -1,104 +1,65 @@
 var Decorators = {
     arr: [
         function override() {
-            this.before(function(opts, next) {
-                opts.args.unshift(opts.parentScope[opts.methodName].bind(opts.scope));
-                next();
-            });
+            meta.args.unshift(meta.parentScope[meta.methodName].bind(this));
         }
     ],
     locals: {},
     add: function(ann) {
-        this.arr.push(ann);
+        Decorators.arr.push(ann);
     },
     names: function() {
-        return this.arr.map(function(fn) {
+        return Decorators.arr.map(function(fn) {
             return fn.name;
         });
     },
-    getAnnotation: function(annotationName) {
-        for (var i = 0; i < this.arr.length; i++) {
-            if (this.arr[i].name === annotationName.replace("@", "")) {
-                return this.arr[i];
+    getDecoratorFn: function(annotationName) {
+        for (var i = 0; i < Decorators.arr.length; i++) {
+            if (Decorators.arr[i].name === annotationName.replace("@", "")) {
+                return Decorators.arr[i];
             }
         }
     },
-    Store: function(opts) {
-        this.isBefore = true;
-        this.last = null;
-        var befores = [];
-        var afters = [];
-        this.first = function(fn) {
-            this.prepareFirst = function() {
-                befores.unshift(fn);
-            };
-        };
-        this.last = function(fn) {
-            this.prepareLast = function() {
-                afters.push(fn);
-            };
-        };
-        this.before = function(fn) {
-            befores.push(fn);
-        };
-        this.place = function(fn) {
-            if (this.isBefore) {
-                befores.push(fn);
-            } else {
-                afters.push(fn);
-            }
-        };
-        this.after = function(fn) {
-            afters.push(fn);
-        };
+    Store: function(opts, propertyDeclaration) {
+        var index = 0;
         this.next = function() {
-            var nextBeforeFn = befores.shift();
-            if (nextBeforeFn) {
-                nextBeforeFn.call(this, opts, arguments.callee);
-                return;
-            }
-            if (!opts.preventExecution) {
-                opts.result = opts.method.apply(opts.scope, opts.args);
-                opts.preventExecution = true;
-            }
-            var nextAfterFn = afters.shift();
-            if (nextAfterFn) {
-                nextAfterFn.call(this, opts, arguments.callee);
-            }
-        };
-    },
-    fireMethodDecorators: function(Decorators, storeInstance, locals) {
-
-        for (var i = 0; i < Decorators.length; i++) {
-            if (typeof Decorators[i] === "function") {
-                storeInstance.isBefore = false;
-                continue;
-            }
-            var preparedAnnotation = Decorators[i].split(":");
-            var annotationFn = this.getAnnotation(preparedAnnotation[0]);
-            var annotationArguments = preparedAnnotation[1];
-
-            with(locals) {
-                if (annotationArguments) {
-                    eval("(" + annotationFn + ".call(storeInstance, " + annotationArguments + "))");
-                } else {
-                    eval("(" + annotationFn + ".call(storeInstance))");
+            var currentStep = propertyDeclaration[index];
+            if (typeof currentStep === "function") {
+                opts.result = currentStep.apply(opts.scope, opts.args);
+            } else if (typeof currentStep === "string") {
+                var stepProperties = currentStep.split(":");
+                var stepFunctionName = stepProperties[0];
+                var stepArguments = stepProperties[1];
+                var rawDecorator = Decorators.getDecoratorFn(stepFunctionName);
+                var decoratedMethod;
+                decoratedMethod = Decorators.transpileMethod(rawDecorator, opts, arguments.callee);
+                with(Decorators.locals) {
+                    if (stepArguments) {
+                        eval("(" + decoratedMethod + ".call(opts.scope, " + stepArguments + "))");
+                    } else {
+                        eval("(" + decoratedMethod + ".call(opts.scope))");
+                    }
                 }
             }
+            index++;
+        };
+    },
+    transpileMethod: function(method, meta, next) {
+        var methodToString = method.toString();
+        var methodDeclaration = methodToString
+            .substring(methodToString.indexOf("{") + 1, methodToString.lastIndexOf("}"));
+
+        if (!methodDeclaration.match(/[^a-zA-Z_$]next[^a-zA-Z_$0-9]/g)) {
+            methodDeclaration += "\nnext();"
         }
-        if (typeof storeInstance.prepareFirst === "function") {
-            storeInstance.prepareFirst();
-        }
-        if (typeof storeInstance.prepareLast === "function") {
-            storeInstance.prepareLast();
-        }
+        return eval("(function(){ " + methodDeclaration + " })");
     },
     getMethodDecorators: function(array) {
         return array.filter(function(item) {
             return typeof item !== "function";
         });
     },
-    getAnnotatedMethod: function(array) {
+    getDecoratedMethod: function(array) {
         return array.find(function(item) {
             return typeof item === "function";
         });
@@ -109,18 +70,18 @@ var Decorators = {
         });
     },
     isValidAnnotationArray: function(array) {
-        return this.getMethodDecorators(array)
+        return Decorators.getMethodDecorators(array)
             .map(function(item) {
                 return item.split(":")
                     .shift();
             })
-            .every(this.getAnnotation, this);
+            .every(Decorators.getDecoratorFn, Decorators);
     },
     compile: function(superClass, propertyName, propertyValue) {
         if (!(
                 propertyValue &&
-                this.isValidStructure(propertyValue) &&
-                this.isValidAnnotationArray(propertyValue)
+                Decorators.isValidStructure(propertyValue) &&
+                Decorators.isValidAnnotationArray(propertyValue)
             )) {
             return propertyValue;
         }
@@ -132,15 +93,13 @@ var Decorators = {
             var opts = {
                 scope: this,
                 parentScope: superClass.prototype,
-                method: selfDecorators.getAnnotatedMethod(propertyValue),
+                method: selfDecorators.getDecoratedMethod(propertyValue),
                 methodName: propertyName,
                 args: Array.prototype.slice.call(arguments),
                 result: undefined
             };
 
-            var store = new selfDecorators.Store(opts);
-
-            selfDecorators.fireMethodDecorators(propertyValue, store, selfDecorators.locals);
+            var store = new selfDecorators.Store(opts, propertyValue);
 
             store.next();
 
