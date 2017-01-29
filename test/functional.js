@@ -16,8 +16,8 @@ var coolProgrammer;
 Decorators.locals.http = http;
 Decorators.locals.aux = [];
 
-Decorators.add(function xhrGet(host) {
-    this.before(function(opts, next) {
+Decorators.execution(
+    function xhrGet(host) {
         http.get({
             host: host
         }, function(res) {
@@ -26,55 +26,28 @@ Decorators.add(function xhrGet(host) {
                 body = body + d;
             });
             res.on("end", function() {
-                opts.args.unshift(body);
+                meta.args.unshift(body);
                 next();
             });
         });
-    });
-});
+    },
+    function log() {
+        aux.push("logged");
+    },
+    function processResponse() {
+        meta.args[0] = "something";
+    },
+    function executeFn(fnName) {
+        meta.scope[fnName]();
+    },
+    function jsonStringify(param) {
+        meta.args[param] = JSON.stringify(meta.args[param]);
+    },
+    function appendResult() {
+        meta.result.push("append...");
+    }
+);
 
-Decorators.add(function log() {
-    aux.push("logged");
-});
-
-
-Decorators.add(function processResponse() {
-    opts.args[0] = "something";
-});
-
-Decorators.add(function executeFn(fnName) {
-    opts.scope[fnName]();
-});
-
-Decorators.add(function jsonStringify(param) {
-    opts.args[param] = JSON.stringify(opts.args[param]);
-});
-
-Decorators.add(function tryReferenceError() {
-    this.before(function(opts, next) {
-        opts.preventExecution = true;
-        opts.result = [];
-        try {
-            opts.result.push(opts.method.apply(opts.scope, opts.args))
-        } catch (e) {
-            opts.result.push("error");
-        } finally {
-            next();
-        }
-    });
-
-    this.last(function(opts, next) {
-        opts.result.push("lastExecution");
-        next();
-    });
-});
-
-Decorators.add(function appendResult() {
-    this.after(function(opts, next) {
-        opts.result.push("append...");
-        next();
-    });
-});
 
 describe("functional testing 1", function() {
     before(function() {

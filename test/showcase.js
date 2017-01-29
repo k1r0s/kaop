@@ -21,26 +21,24 @@ Decorators.locals.myCoolService = $$myCoolService = 1;
  * related with the targeted class instance
  */
 
-Decorators.add(function save() {
-    this.after(function(opts, next) {
-        if (!opts.result) {
-            next();
-            return;
-        }
+Decorators.execution(function save() {
+    if (!meta.result) {
+        next();
+        return;
+    }
 
-        // ... myCoolService becomes available, here we
-        // place our code to perform a request to the server
-        // ofc we skip this here. kaop annotations are callback
-        // driven, so we execute `next` function when action is
-        // complete. `next` will trigger the queue actions...
-        var METHOD = opts.scope.id ? "PUT" : "POST";
-        var EXAMPLE_REQUEST = "somehost:8080/api" + opts.scope.url();
-        var REQUEST_PAYLOAD = opts.result;
+    // ... myCoolService becomes available, here we
+    // place our code to perform a request to the server
+    // ofc we skip this here. kaop annotations are callback
+    // driven, so we execute `next` function when action is
+    // complete. `next` will trigger the queue actions...
+    var METHOD = this.id ? "PUT" : "POST";
+    var EXAMPLE_REQUEST = "somehost:8080/api" + this.url();
+    var REQUEST_PAYLOAD = meta.result;
 
-        console.log(METHOD, EXAMPLE_REQUEST, REQUEST_PAYLOAD);
+    console.log(METHOD, EXAMPLE_REQUEST, REQUEST_PAYLOAD);
 
-        setTimeout(next, 500);
-    });
+    setTimeout(next, 500);
 });
 
 
@@ -49,19 +47,17 @@ Decorators.add(function save() {
  * this decorator serializes the targeted instance
  */
 
-Decorators.add(function serialize() {
-    this.after(function(opts, next) {
-        if (!opts.result) {
-            next();
-            return;
-        }
-        // opts.result is the returned value at the
-        // current point of flow
-        //
-        // opts.scope is the current instance of decorated class
-        opts.result = JSON.stringify(opts.scope.attributes);
+Decorators.execution(function serialize() {
+    if (!meta.result) {
         next();
-    });
+        return;
+    }
+    // opts.result is the returned value at the
+    // current point of flow
+    //
+    // opts.scope is the current instance of decorated class
+    meta.result = JSON.stringify(this.attributes);
+    next();
 });
 
 
@@ -72,11 +68,8 @@ Decorators.add(function serialize() {
  * param  {string} nameContext method to be executed
  */
 
-Decorators.add(function defer(nameContext) {
-    this.place(function(opts, next) {
-        eval("opts.scope." + nameContext + "(opts.methodName)");
-        next();
-    });
+Decorators.execution(function defer(nameContext) {
+    eval("this." + nameContext + "(meta.methodName)");
 });
 
 /**
@@ -140,7 +133,7 @@ var ExampleModel = Class({
             if (action.id === actionName) {
                 action.fn();
             }
-        })
+        });
     },
 
     /**
@@ -175,7 +168,7 @@ describe("KAOP SHOWCASE", function() {
     var exampleModelInstance;
 
     before(function() {
-        exampleModelInstance = new ExampleModel;
+        exampleModelInstance = new ExampleModel();
     });
 
     it("should perform a request when attribute change", function(done) {
@@ -187,4 +180,4 @@ describe("KAOP SHOWCASE", function() {
         exampleModelInstance.set("name", "Iván");
 
     });
-})
+});

@@ -2,6 +2,13 @@ var assert = require("assert");
 var main = require("../index");
 var Decorators = main.Decorators;
 
+
+Decorators.execution(function prop1() {});
+Decorators.execution(function prop2() {});
+Decorators.declaration(function prop3() {});
+Decorators.execution(function prop4() {});
+
+
 describe("Decorators::compile()", function() {
 
     it("propertyValue are falsy values, so we must receive it as normal", function() {
@@ -41,61 +48,44 @@ describe("Decorators::compile()", function() {
 
 describe("Decorators::add, ::names, ::getDecoratorFn", function() {
 
-    before(function() {
-        Decorators.add({
-            decorator: function prop1() {}
-        });
-        Decorators.add({
-            decorator: function prop2() {}
-        });
-        Decorators.add({
-            decorator: function prop3() {}
-        });
-        Decorators.add({
-            decorator: function prop4() {}
-        });
-    });
-
     it("Decorators::getDecoratorFn() should return the annotation function definition", function() {
-        assert.strictEqual("prop3", Decorators.getDecoratorFn("prop3").decorator
-            .name);
+        assert.strictEqual("prop3", Decorators.getDecoratorFn("prop3").name);
     });
 });
 
-describe("Decorators::getMethodDecorators()", function() {
-    it("should return the complete list of defined Decorators", function() {
-        assert.deepEqual(["httpGet: 'Person'", "json"],
-            Decorators.getMethodDecorators(["httpGet: 'Person'", "json", function() {}]));
-        assert.deepEqual(["$httpGet: 'Person'", "$json"],
-            Decorators.getMethodDecorators(["$httpGet: 'Person'", function() {}, "$json"]));
-        assert.deepEqual(["_httpGet: 'Person'", "_json"],
-            Decorators.getMethodDecorators([function() {}, "_httpGet: 'Person'", "_json"]));
-        assert.deepEqual(["&override"],
-            Decorators.getMethodDecorators(["&override", function() {}]));
+describe("Decorators::getExecutionIteration", function() {
+    it("should get only decorators added in execution phase", function() {
+        assert.strictEqual("prop1,function () {}", Decorators.getExecutionIteration(["prop1", "prop3", function() {}]).join(","));
+    });
+
+    it("should get only decorators added in declaration phase", function() {
+        assert.strictEqual("prop3", Decorators.getDeclarationIteration(["prop1", "prop3", function() {}]).join(","));
     });
 });
-describe("Decorators::isValidAnnotationArray()", function() {
+
+describe("Decorators::isRightImplemented()", function() {
     it("should check if the given Decorators are declared", function() {
-        assert(Decorators.isValidAnnotationArray(["override", function() {}]));
+        assert(Decorators.isRightImplemented(["override", function() {}]));
     });
     it("should return false if the Decorators are not declared", function() {
-        assert(!Decorators.isValidAnnotationArray(["$httpGet: 'Person'", "$json", function() {}]));
+        assert(!Decorators.isRightImplemented(["$httpGet: 'Person'", "$json", function() {}]));
     });
     it("if the Decorators are declared it must return true", function() {
-        Decorators.add({
-            decorator: function httpGet() {}
-        });
-        Decorators.add({
-            decorator: function json() {}
-        });
-        assert(Decorators.isValidAnnotationArray(["httpGet: 'Person'", "json", function() {}]));
-        assert(!Decorators.isValidAnnotationArray(["ajdhkasjadh: 'Person'", "json", function() {}]));
+        Decorators.declaration(function httpGet() {});
+        Decorators.execution(function json() {});
+        assert(Decorators.isRightImplemented(["httpGet: 'Person'", "json", function() {}]));
+        assert(!Decorators.isRightImplemented(["ajdhkasjadh: 'Person'", "json", function() {}]));
     });
 });
 
 describe("Decorators::transpileMethod", function() {
     it("third parameter should be always called, even if fn body does not contain the `next` reference", function(done) {
         Decorators.transpileMethod(function() {}, {}, done)();
+    });
+    it("function should be assembled with its arguments back", function() {
+        assert.strictEqual("secret", Decorators.transpileMethod(function(something) {
+            return something;
+        }, {}, function() {})("secret"));
     });
     it("third parameter should be always called", function(done) {
         Decorators.transpileMethod(function() {
