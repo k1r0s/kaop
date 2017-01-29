@@ -20,7 +20,7 @@ var Class = function(sourceClass, extendedProperties, static) {
     var inheritedProperties = Object.create(sourceClass.prototype);
 
     for (var propertyName in extendedProperties) {
-        inheritedProperties[propertyName] = Decorators.compile(sourceClass, propertyName, extendedProperties[propertyName]);
+        inheritedProperties[propertyName] = Decorators.bootstrap(sourceClass, propertyName, extendedProperties[propertyName]);
     }
 
     if (!static) {
@@ -173,7 +173,7 @@ var Decorators = {
             })
             .every(this.getAnnotation, this);
     },
-    compile: function(superClass, propertyName, propertyValue) {
+    bootstrap: function(superClass, propertyName, propertyValue) {
         if (!(
                 propertyValue &&
                 this.isValidStructure(propertyValue) &&

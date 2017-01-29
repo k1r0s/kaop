@@ -3,7 +3,6 @@ var main = require("../index");
 var Decorators = main.Decorators;
 var Phase = main.Phase;
 
-
 Decorators.push(
     Phase.EXECUTE,
     function prop1() {},
@@ -16,42 +15,88 @@ Decorators.push(
     function prop3() {}
 );
 
-
-
-describe("Decorators::compile()", function() {
+describe("Decorators::bootstrap()", function() {
 
     it("propertyValue are falsy values, so we must receive it as normal", function() {
-        assert.strictEqual(null, Decorators.compile(undefined, undefined, null));
-        assert.strictEqual(undefined, Decorators.compile(undefined, undefined, undefined));
-        assert.strictEqual(0, Decorators.compile(undefined, undefined, 0));
-        assert.strictEqual(false, Decorators.compile(undefined, undefined, false));
+        assert.strictEqual(null, Decorators.bootstrap({
+            sourceClass: undefined,
+            propertyName: undefined,
+            propertyValue: null
+        }));
+        assert.strictEqual(undefined, Decorators.bootstrap({
+            sourceClass: undefined,
+            propertyName: undefined,
+            propertyValue: undefined
+        }));
+        assert.strictEqual(0, Decorators.bootstrap({
+            sourceClass: undefined,
+            propertyName: undefined,
+            propertyValue: 0
+        }));
+        assert.strictEqual(false, Decorators.bootstrap({
+            sourceClass: undefined,
+            propertyName: undefined,
+            propertyValue: false
+        }));
     });
 
     it("propertyValue are numbers, should be retrieved without modifications", function() {
-        assert.strictEqual(1, Decorators.compile(undefined, undefined, 1));
-        assert.strictEqual(-2, Decorators.compile(undefined, undefined, -2));
-        assert.strictEqual(313, Decorators.compile(undefined, undefined, 313));
-        assert.strictEqual(437, Decorators.compile(undefined, undefined, 437));
-        assert.strictEqual(437.333, Decorators.compile(undefined, undefined, 437.333));
+        assert.strictEqual(1, Decorators.bootstrap({
+            sourceClass: undefined,
+            propertyName: undefined,
+            propertyValue: 1
+        }));
+        assert.strictEqual(-2, Decorators.bootstrap({
+            sourceClass: undefined,
+            propertyName: undefined,
+            propertyValue: -2
+        }));
+        assert.strictEqual(437.333, Decorators.bootstrap({
+            sourceClass: undefined,
+            propertyName: undefined,
+            propertyValue: 437.333
+        }));
     });
 
     it("propertyValue are complex types as strings, objects or functions", function() {
-        assert(typeof Decorators.compile(undefined, undefined, function() {}) === "function");
-        assert.deepEqual(["prop1", "prop2", "prop3"], Decorators.compile(undefined, undefined, ["prop1", "prop2", "prop3"]));
-        assert.deepEqual({}, Decorators.compile(undefined, undefined, {}));
-        assert.strictEqual("something", Decorators.compile(undefined, undefined, "something"));
+        assert(typeof Decorators.bootstrap({
+            sourceClass: undefined,
+            propertyName: undefined,
+            propertyValue: function() {}
+        }) === "function");
+        assert.deepEqual(["prop1", "prop2", "prop3"], Decorators.bootstrap({
+            sourceClass: undefined,
+            propertyName: undefined,
+            propertyValue: ["prop1", "prop2", "prop3"]
+        }));
+        assert.deepEqual({}, Decorators.bootstrap({
+            sourceClass: undefined,
+            propertyName: undefined,
+            propertyValue: {}
+        }));
+        assert.strictEqual("something", Decorators.bootstrap({
+            sourceClass: undefined,
+            propertyName: undefined,
+            propertyValue: "something"
+        }));
     });
 
     it("propertyValue is an array that contains a function in the last slot, it should return the annotatedFunction", function() {
-        assert(typeof Decorators.compile(undefined, undefined, ["override", function() {}]) === "function");
+        assert(typeof Decorators.bootstrap({
+            phase: Phase.EXECUTE,
+            sourceClass: undefined,
+            propertyName: undefined,
+            propertyValue: ["override", function() {}]
+        }) === "function");
     });
 
-    it("propertyValue is an array that contains a function in the last slot, it should return the annotatedFunction", function() {
-        assert(typeof Decorators.compile(undefined, undefined, [function() {}, "override"]) === "function");
-    });
 
     it("if contains any annotation that was not added yet to the Decorators pool, it should return the array instead", function() {
-        assert(typeof Decorators.compile(undefined, undefined, ["$annotationThatNotExists", function() {}]) !== "function");
+        assert(typeof Decorators.bootstrap({
+            sourceClass: undefined,
+            propertyName: undefined,
+            propertyValue: ["undefinedDecorator", function() {}]
+        }) !== "function");
     });
 });
 

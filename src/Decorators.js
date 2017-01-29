@@ -93,34 +93,67 @@ module.exports = Decorators = {
     getDecoratorArgumentsByImplementation: function(rawDecoratorImplementation) {
         return rawDecoratorImplementation.split(":")[1];
     },
-    compile: function(superClass, propertyName, propertyValue) {
+    bootstrap: function(config) {
         if (!(
-                propertyValue &&
-                Decorators.isValidStructure(propertyValue) &&
-                Decorators.isRightImplemented(propertyValue)
+                config.propertyValue &&
+                Decorators.isValidStructure(config.propertyValue) &&
+                Decorators.isRightImplemented(config.propertyValue)
             )) {
-            return propertyValue;
+            return config.propertyValue;
         }
 
-        return function() {
+        if (config.phase === Phase.EXECUTE) {
+            return function() {
 
-            var executionProps = {
-                method: Decorators.getDecoratedMethod(propertyValue),
-                methodName: propertyName,
-                scope: this,
-                parentScope: superClass.prototype,
-                args: Array.prototype.slice.call(arguments),
-                result: undefined
+                var executionProps = {
+                    method: Decorators.getDecoratedMethod(config.propertyValue),
+                    methodName: config.propertyName,
+                    scope: this,
+                    parentScope: config.sourceClass.prototype,
+                    args: Array.prototype.slice.call(arguments),
+                    result: undefined
+                };
+
+                new methodExecutionIteration(Decorators.getExecutionIteration(config.propertyValue), executionProps);
+
+                return executionProps.result;
             };
-
-            new methodExecutionIteration(Decorators.getExecutionIteration(propertyValue), executionProps);
-
-            return executionProps.result;
-        };
+        } else if (config.phase === Phase.INSTANCE) {
+            var instantiateProps = {
+                method: Decorators.getDecoratedMethod(config.propertyValue),
+                methodName: config.propertyName,
+                scope: config.instance
+            };
+            new methodInstantiationIteration(Decorators.getInstantiationIteration(config.propertyValue), instantiateProps);
+        }
     }
 };
 
+var methodInstantiationIteration = function(definitionArray, props) {
+    if (!definitionArray.length) {
+        return;
+    }
+    this.index = -1;
+    this.step = function() {
+        this.index++;
+        var currentStep = definitionArray[this.index];
+        var stepFunctionName = Decorators.getDecoratorNameByImplementation(currentStep);
+        var stepArguments = Decorators.getDecoratorArgumentsByImplementation(currentStep);
+        var rawDecorator = Decorators.getDecoratorFn(stepFunctionName);
+        var decoratedMethod = Decorators.transpileMethod(rawDecorator, props, arguments.callee.bind(this));
+        if (stepArguments) {
+            eval("decoratedMethod.call(props.scope, " + stepArguments + ")");
+        } else {
+            eval("decoratedMethod.call(props.scope)");
+        }
+    };
+    this.step();
+};
+
 var methodExecutionIteration = function(definitionArray, props) {
+    if (!definitionArray.length) {
+        return;
+    }
     this.index = -1;
     this.step = function() {
         this.index++;

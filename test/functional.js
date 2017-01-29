@@ -20,8 +20,8 @@ Decorators.locals.aux = [];
 
 Decorators.push(
     Phase.INSTANCE,
-    function listen(evt) {
-        emitter.on(evt, meta.method);
+    function executeWhenCreated() {
+        setTimeout(this[meta.methodName], 200);
     }
 );
 
@@ -58,26 +58,46 @@ Decorators.push(
     }
 );
 
+Person = Class({
+    constructor: function(name, dborn) {
+        this.name = name;
+        this.dborn = dborn;
+    },
+    run: function() {
+        return "Im running!";
+    },
+    getAge: function() {
+        var currentYear = new Date()
+            .getFullYear();
+        var yearBorn = this.dborn.getFullYear();
+        return currentYear - yearBorn;
+    }
+});
+
+Programmer = Class.inherits(Person, {
+    constructor: ["override", function(parent, name, dborn, favouriteLanguage) {
+        parent(name, dborn);
+        this.favLang = favouriteLanguage;
+    }],
+    run: ["override", function(parent) {
+        return parent() + " but... not as faster, coz im fat :/";
+    }],
+    code: function() {
+        return "Im codding in " + this.favLang;
+    }
+});
+
+CoolProgrammer = Class.inherits(Programmer, {
+    constructor: ["override", function(parent, name, dborn, favouriteLanguage) {
+        parent(name, dborn, favouriteLanguage);
+    }],
+    run: function() {
+        return "IM FAST AS HELL!! GET OUT OF MY WAY!";
+    }
+});
 
 describe("functional testing 1", function() {
     before(function() {
-
-        Person = Class({
-            constructor: function(name, dborn) {
-                this.name = name;
-                this.dborn = dborn;
-            },
-            run: function() {
-                return "Im running!";
-            },
-            getAge: function() {
-                var currentYear = new Date()
-                    .getFullYear();
-                var yearBorn = this.dborn.getFullYear();
-                return currentYear - yearBorn;
-            }
-        });
-
         normalPerson = new Person("Tom", new Date(1978, 4, 11));
     });
 
@@ -91,28 +111,6 @@ describe("functional testing 1", function() {
 describe("functional testing 2", function() {
 
     before(function() {
-        Programmer = Class.inherits(Person, {
-            constructor: ["override", function(parent, name, dborn, favouriteLanguage) {
-                parent(name, dborn);
-                this.favLang = favouriteLanguage;
-            }],
-            run: ["override", function(parent) {
-                return parent() + " but... not as faster, coz im fat :/";
-            }],
-            code: function() {
-                return "Im codding in " + this.favLang;
-            }
-        });
-
-        CoolProgrammer = Class.inherits(Programmer, {
-            constructor: ["override", function(parent, name, dborn, favouriteLanguage) {
-                parent(name, dborn, favouriteLanguage);
-            }],
-            run: function() {
-                return "IM FAST AS HELL!! GET OUT OF MY WAY!";
-            }
-        });
-
         normalPerson = new Person("Joe", new Date(1990, 2, 21));
         normalProgrammer = new Programmer("Mike", new Date(1982, 7, 18), "Java");
         coolProgrammer = new CoolProgrammer("Ivan", new Date(1990, 8, 22), "Javascript");
@@ -254,7 +252,7 @@ describe.skip("Hooks `first` and `last`, flow control", function() {
                 function aFunctionWhoDoesNothing() {}
                 return eval(fnName + "()");
             }, "appendResult"]
-        })
+        });
     });
 
     it("::myMethod will trigger an exception, should be captured", function() {
@@ -281,22 +279,21 @@ describe("multiple async operations", function() {
     });
 });
 
-describe.skip("instance phase decorators", function() {
+describe("intro to instance phase decorators", function() {
     var myDummyClass;
     before(function() {
         DummyClass = Class({
-            constructor: function(id) {
-                this.id = id;
+            constructor: function(callback) {
+                this.endThisTest = callback;
             },
-            handle: ["listen: 'aww'", function() {
-                console.log(this.id);
+            handle: ["executeWhenCreated", function() {
+                this.endThisTest();
             }]
         });
     });
 
     it("should able to see their own context in instantiate  phase", function(done) {
-        new DummyClass;
-
-        emitter.emit("aww");
+        this.slow(500);
+        new DummyClass(done);
     });
 });
