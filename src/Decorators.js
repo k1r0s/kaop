@@ -1,15 +1,17 @@
+var Phase = require("./Phase");
+
 module.exports = Decorators = {
     locals: {},
     executionArr: [],
-    declarationArr: [],
-    execution: function() {
-        for (var i = 0; i < arguments.length; i++) {
-            Decorators.executionArr.push(arguments[i]);
-        }
-    },
-    declaration: function() {
-        for (var i = 0; i < arguments.length; i++) {
-            Decorators.declarationArr.push(arguments[i]);
+    instantiationArr: [],
+    push: function() {
+        var phase = arguments[0];
+        for (var i = 1; i < arguments.length; i++) {
+            if (phase === Phase.INSTANCE) {
+                Decorators.instantiationArr.push(arguments[i]);
+            } else if (phase === Phase.EXECUTE) {
+                Decorators.executionArr.push(arguments[i]);
+            }
         }
     },
     transpileMethod: function(method, meta, next) {
@@ -29,13 +31,13 @@ module.exports = Decorators = {
         }
     },
     getExecutionIteration: function(rawImplementation) {
-        return rawImplementation.filter(Decorators.notInDeclarationPhase);
+        return rawImplementation.filter(Decorators.notInInstantiatePhase);
     },
-    getDeclarationIteration: function(rawImplementation) {
+    getInstantiationIteration: function(rawImplementation) {
         return rawImplementation.filter(Decorators.notInExecutionPhase);
     },
-    notInDeclarationPhase: function(decoratorImplementation) {
-        return typeof decoratorImplementation === "function" || !Decorators.declarationArr
+    notInInstantiatePhase: function(decoratorImplementation) {
+        return typeof decoratorImplementation === "function" || !Decorators.instantiationArr
             .map(function(decorator) {
                 return decorator.name;
             })
@@ -71,7 +73,7 @@ module.exports = Decorators = {
         });
     },
     getAllDefinitions: function() {
-        return Decorators.executionArr.concat(Decorators.declarationArr);
+        return Decorators.executionArr.concat(Decorators.instantiationArr);
     },
     isRightImplemented: function(array) {
         var completeDecoratorArrayNames = Decorators.getAllDefinitions()
@@ -100,18 +102,11 @@ module.exports = Decorators = {
             return propertyValue;
         }
 
-        var declarationProps = {
-            method: Decorators.getDecoratedMethod(propertyValue),
-            methodName: propertyName
-        };
-
-        // Decorators.fireMethod(propertyValue, evaluationProps, Phase.DECLARATION);
-
         return function() {
 
             var executionProps = {
-                method: declarationProps.method,
-                methodName: declarationProps.methodName,
+                method: Decorators.getDecoratedMethod(propertyValue),
+                methodName: propertyName,
                 scope: this,
                 parentScope: superClass.prototype,
                 args: Array.prototype.slice.call(arguments),
@@ -146,8 +141,4 @@ var methodExecutionIteration = function(definitionArray, props) {
         }
     };
     this.step();
-};
-
-var methodDeclarationIteration = function(definitionArray, props) {
-
 };

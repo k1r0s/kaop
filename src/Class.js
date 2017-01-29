@@ -5,11 +5,12 @@ var Class = function(sourceClass, extendedProperties, static) {
     var inheritedProperties = Object.create(sourceClass.prototype);
 
     for (var propertyName in extendedProperties) {
-        inheritedProperties[propertyName] = Decorators.compile(sourceClass, propertyName, extendedProperties[propertyName]);
+        inheritedProperties[propertyName] = Decorators.compile(sourceClass, propertyName, extendedProperties[propertyName], "execution");
     }
 
     if (!static) {
         var extendedClass = function() {
+
             try {
                 if (typeof this.constructor === "function") this.constructor.apply(this, arguments);
                 for (var propertyName in this) {

@@ -10,8 +10,7 @@ var assert = require("assert");
 var main = require("../index");
 var Class = main.Class;
 var Decorators = main.Decorators;
-
-
+var Phase = main.Phase;
 
 Decorators.locals.myCoolService = $$myCoolService = 1;
 
@@ -21,25 +20,27 @@ Decorators.locals.myCoolService = $$myCoolService = 1;
  * related with the targeted class instance
  */
 
-Decorators.execution(function save() {
-    if (!meta.result) {
-        next();
-        return;
-    }
+Decorators.push(
+    Phase.EXECUTE,
+    function save() {
+        if (!meta.result) {
+            next();
+            return;
+        }
 
-    // ... myCoolService becomes available, here we
-    // place our code to perform a request to the server
-    // ofc we skip this here. kaop annotations are callback
-    // driven, so we execute `next` function when action is
-    // complete. `next` will trigger the queue actions...
-    var METHOD = this.id ? "PUT" : "POST";
-    var EXAMPLE_REQUEST = "somehost:8080/api" + this.url();
-    var REQUEST_PAYLOAD = meta.result;
+        // ... myCoolService becomes available, here we
+        // place our code to perform a request to the server
+        // ofc we skip this here. kaop annotations are callback
+        // driven, so we execute `next` function when action is
+        // complete. `next` will trigger the queue actions...
+        var METHOD = this.id ? "PUT" : "POST";
+        var EXAMPLE_REQUEST = "somehost:8080/api" + this.url();
+        var REQUEST_PAYLOAD = meta.result;
 
-    console.log(METHOD, EXAMPLE_REQUEST, REQUEST_PAYLOAD);
+        console.log(METHOD, EXAMPLE_REQUEST, REQUEST_PAYLOAD);
 
-    setTimeout(next, 500);
-});
+        setTimeout(next, 500);
+    });
 
 
 /**
@@ -47,18 +48,20 @@ Decorators.execution(function save() {
  * this decorator serializes the targeted instance
  */
 
-Decorators.execution(function serialize() {
-    if (!meta.result) {
+Decorators.push(
+    Phase.EXECUTE,
+    function serialize() {
+        if (!meta.result) {
+            next();
+            return;
+        }
+        // opts.result is the returned value at the
+        // current point of flow
+        //
+        // opts.scope is the current instance of decorated class
+        meta.result = JSON.stringify(this.attributes);
         next();
-        return;
-    }
-    // opts.result is the returned value at the
-    // current point of flow
-    //
-    // opts.scope is the current instance of decorated class
-    meta.result = JSON.stringify(this.attributes);
-    next();
-});
+    });
 
 
 /**
@@ -68,9 +71,11 @@ Decorators.execution(function serialize() {
  * param  {string} nameContext method to be executed
  */
 
-Decorators.execution(function defer(nameContext) {
-    eval("this." + nameContext + "(meta.methodName)");
-});
+Decorators.push(
+    Phase.EXECUTE,
+    function defer(nameContext) {
+        eval("this." + nameContext + "(meta.methodName)");
+    });
 
 /**
  * class ExampleModel

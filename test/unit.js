@@ -1,12 +1,21 @@
 var assert = require("assert");
 var main = require("../index");
 var Decorators = main.Decorators;
+var Phase = main.Phase;
 
 
-Decorators.execution(function prop1() {});
-Decorators.execution(function prop2() {});
-Decorators.declaration(function prop3() {});
-Decorators.execution(function prop4() {});
+Decorators.push(
+    Phase.EXECUTE,
+    function prop1() {},
+    function prop2() {},
+    function prop4() {}
+);
+
+Decorators.push(
+    Phase.INSTANCE,
+    function prop3() {}
+);
+
 
 
 describe("Decorators::compile()", function() {
@@ -53,13 +62,17 @@ describe("Decorators::add, ::names, ::getDecoratorFn", function() {
     });
 });
 
-describe("Decorators::getExecutionIteration", function() {
+describe("Decorators:: iterations", function() {
+    var testImplementation;
+    before(function() {
+        testImplementation = ["prop1", "prop3", function() {}];
+    });
     it("should get only decorators added in execution phase", function() {
-        assert.strictEqual("prop1,function () {}", Decorators.getExecutionIteration(["prop1", "prop3", function() {}]).join(","));
+        assert.strictEqual("prop1,function () {}", Decorators.getExecutionIteration(testImplementation).join(","));
     });
 
-    it("should get only decorators added in declaration phase", function() {
-        assert.strictEqual("prop3", Decorators.getDeclarationIteration(["prop1", "prop3", function() {}]).join(","));
+    it("should get only decorators added in instantation phase", function() {
+        assert.strictEqual("prop3", Decorators.getInstantiationIteration(testImplementation).join(","));
     });
 });
 
@@ -71,8 +84,7 @@ describe("Decorators::isRightImplemented()", function() {
         assert(!Decorators.isRightImplemented(["$httpGet: 'Person'", "$json", function() {}]));
     });
     it("if the Decorators are declared it must return true", function() {
-        Decorators.declaration(function httpGet() {});
-        Decorators.execution(function json() {});
+        Decorators.push(Phase.EXECUTE, function httpGet() {}, function json() {});
         assert(Decorators.isRightImplemented(["httpGet: 'Person'", "json", function() {}]));
         assert(!Decorators.isRightImplemented(["ajdhkasjadh: 'Person'", "json", function() {}]));
     });

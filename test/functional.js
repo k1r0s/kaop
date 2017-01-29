@@ -1,8 +1,10 @@
 var http = require("http");
+var emitter = new class Emitter extends require("events") {};
 var assert = require("assert");
 var main = require("../index");
 var Class = main.Class;
 var Decorators = main.Decorators;
+var Phase = main.Phase;
 
 var Person;
 var Programmer;
@@ -16,7 +18,15 @@ var coolProgrammer;
 Decorators.locals.http = http;
 Decorators.locals.aux = [];
 
-Decorators.execution(
+Decorators.push(
+    Phase.INSTANCE,
+    function listen(evt) {
+        emitter.on(evt, meta.method);
+    }
+);
+
+Decorators.push(
+    Phase.EXECUTE,
     function xhrGet(host) {
         http.get({
             host: host
@@ -268,5 +278,25 @@ describe("multiple async operations", function() {
 
         MyService.asyncOperation();
 
+    });
+});
+
+describe.skip("instance phase decorators", function() {
+    var myDummyClass;
+    before(function() {
+        DummyClass = Class({
+            constructor: function(id) {
+                this.id = id;
+            },
+            handle: ["listen: 'aww'", function() {
+                console.log(this.id);
+            }]
+        });
+    });
+
+    it("should able to see their own context in instantiate  phase", function(done) {
+        new DummyClass;
+
+        emitter.emit("aww");
     });
 });
