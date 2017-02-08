@@ -6,9 +6,10 @@ var Utils = (function () {
     function Utils() {
     }
     Utils.cookAspectDefinition = function (aspectDefinition) {
+        var aspectDefinitionPartials = aspectDefinition.split(":");
         return {
-            name: aspectDefinition.substr(0, aspectDefinition.indexOf(" ")),
-            args: aspectDefinition.substr(aspectDefinition.indexOf(" ") + 1)
+            name: aspectDefinitionPartials[0],
+            args: aspectDefinitionPartials[1]
         };
     };
     Utils.transpileAspect = function (rawAspect, meta, next) {

@@ -1,9 +1,9 @@
-import { utils }  from "./utils";
+import { Utils }  from "./Utils";
 import { JoinPoint } from "./JoinPoint";
 
 function before (...aspects) {
     return function(proto, key, descriptor){
-        descriptor.value = utils.bootstrap(
+        descriptor.value = Utils.bootstrap(
             JoinPoint.BEFORE_METHOD,
             {
                 method: descriptor.value,

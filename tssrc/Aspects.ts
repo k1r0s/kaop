@@ -1,8 +1,6 @@
-import { IAspect } from "./IAspect";
-
 class Aspects {
     static SERVICES: any
-    static _store: Array<IAspect> = []
+    static _store: Array<() => void > = []
     static add(...aspects): void {
         for (let i = 0; i < aspects.length; i++) {
             this._store.push(aspects[i])

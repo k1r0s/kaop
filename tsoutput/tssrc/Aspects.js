@@ -5,7 +5,7 @@ var Aspects = (function () {
     Aspects.add = function () {
         var aspects = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            aspects[_i - 0] = arguments[_i];
+            aspects[_i] = arguments[_i];
         }
         for (var i = 0; i < aspects.length; i++) {
             this._store.push(aspects[i]);
@@ -16,5 +16,5 @@ var Aspects = (function () {
     };
     return Aspects;
 }());
-exports.Aspects = Aspects;
 Aspects._store = [];
+exports.Aspects = Aspects;

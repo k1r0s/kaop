@@ -1,5 +1,5 @@
 "use strict";
-var utils_1 = require("./utils");
+var Utils_1 = require("./Utils");
 var Aspects_1 = require("./Aspects");
 var BeforeIteration = (function () {
     function BeforeIteration(props) {
@@ -14,9 +14,9 @@ var BeforeIteration = (function () {
         }
         this.aspectIndex++;
         var currentStep = this.iterationProps.aspects[this.aspectIndex];
-        var definition = utils_1.utils.cookAspectDefinition(currentStep);
+        var definition = Utils_1.Utils.cookAspectDefinition(currentStep);
         var rawAspectFn = Aspects_1.Aspects.getAspect(definition.name);
-        var cookedAspect = utils_1.utils.transpileAspect(rawAspectFn, this.iterationProps, this.step.bind(this));
+        var cookedAspect = Utils_1.Utils.transpileAspect(rawAspectFn, this.iterationProps, this.step.bind(this));
         if (definition.args) {
             eval("cookedAspect.call(this.iterationProps.scope, " + definition.args + ")");
         }

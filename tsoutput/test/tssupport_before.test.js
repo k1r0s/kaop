@@ -34,16 +34,16 @@ var Dummy = (function () {
     Dummy.doSomething = function () {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i - 0] = arguments[_i];
+            args[_i] = arguments[_i];
         }
-        console.log("\nmethod execution");
+        console.log("method execution");
         args.pop()();
     };
     return Dummy;
 }());
 Dummy.url = "dummo";
 __decorate([
-    before_1.before("log", "lug# 'url'", "lag"),
+    before_1.before("log", "lug: 'url'", "lag"),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)

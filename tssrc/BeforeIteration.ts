@@ -1,8 +1,7 @@
 import { IAspectsDescriptorAttributes } from "./IAspectsDescriptorAttributes";
-import { utils } from "./utils";
+import { Utils } from "./Utils";
 import { IAspectDefinition } from "./IAspectDefinition";
 import { Aspects } from "./Aspects";
-import { ICookedAspect } from "./ICookedAspect";
 
 class BeforeIteration {
     iterationProps: IAspectsDescriptorAttributes
@@ -19,9 +18,9 @@ class BeforeIteration {
         }
         this.aspectIndex++
         let currentStep = this.iterationProps.aspects[this.aspectIndex]
-        let definition: IAspectDefinition = utils.cookAspectDefinition(currentStep)
+        let definition: IAspectDefinition = Utils.cookAspectDefinition(currentStep)
         let rawAspectFn = Aspects.getAspect(definition.name)
-        let cookedAspect: ICookedAspect = utils.transpileAspect(rawAspectFn, this.iterationProps, this.step.bind(this))
+        let cookedAspect = Utils.transpileAspect(rawAspectFn, this.iterationProps, this.step.bind(this))
         if(definition.args){
             eval("cookedAspect.call(this.iterationProps.scope, " + definition.args + ")");
         } else {

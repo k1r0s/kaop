@@ -28,9 +28,9 @@ Aspects.add(
 class Dummy {
     static url: string = "dummo"
 
-    @before("log", "lug# 'url'", "lag")
+    @before("log", "lug: 'url'", "lag")
     static doSomething(...args){
-        console.log("\nmethod execution")
+        console.log("method execution")
         args.pop()()
     }
 }
