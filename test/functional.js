@@ -1,8 +1,10 @@
 var http = require("http");
+var emitter = new class Emitter extends require("events") {};
 var assert = require("assert");
 var main = require("../index");
 var Class = main.Class;
 var Decorators = main.Decorators;
+var Phase = main.Phase;
 
 var Person;
 var Programmer;
@@ -16,8 +18,16 @@ var coolProgrammer;
 Decorators.locals.http = http;
 Decorators.locals.aux = [];
 
-Decorators.add(function xhrGet(host) {
-    this.before(function(opts, next) {
+Decorators.push(
+    Phase.INSTANCE,
+    function executeWhenCreated() {
+        setTimeout(this[meta.methodName], 200);
+    }
+);
+
+Decorators.push(
+    Phase.EXECUTE,
+    function xhrGet(host) {
         http.get({
             host: host
         }, function(res) {
@@ -26,87 +36,68 @@ Decorators.add(function xhrGet(host) {
                 body = body + d;
             });
             res.on("end", function() {
-                opts.args.unshift(body);
+                meta.args.unshift(body);
                 next();
             });
         });
-    });
-});
-
-Decorators.add(function log() {
-    this.place(function(opts, next) {
+    },
+    function log() {
         aux.push("logged");
-        next();
-    });
+    },
+    function processResponse() {
+        meta.args[0] = "something";
+    },
+    function executeFn(fnName) {
+        meta.scope[fnName]();
+    },
+    function jsonStringify(param) {
+        meta.args[param] = JSON.stringify(meta.args[param]);
+    },
+    function appendResult() {
+        meta.result.push("append...");
+    }
+);
+
+Person = Class({
+    constructor: function(name, dborn) {
+        this.name = name;
+        this.dborn = dborn;
+    },
+    run: function() {
+        return "Im running!";
+    },
+    getAge: function() {
+        var currentYear = new Date()
+            .getFullYear();
+        var yearBorn = this.dborn.getFullYear();
+        return currentYear - yearBorn;
+    }
 });
 
-
-Decorators.add(function processResponse() {
-    this.before(function(opts, next) {
-        opts.args[0] = "something";
-        next();
-    })
+Programmer = Class.inherits(Person, {
+    constructor: ["override", function(parent, name, dborn, favouriteLanguage) {
+        parent(name, dborn);
+        this.favLang = favouriteLanguage;
+    }],
+    run: ["override", function(parent) {
+        return parent() + " but... not as faster, coz im fat :/";
+    }],
+    code: function() {
+        return "Im codding in " + this.favLang;
+    }
 });
 
-Decorators.add(function executeFn(fnName) {
-    this.after(function(opts, next) {
-        opts.scope[fnName]();
-        next();
-    })
-});
-
-Decorators.add(function jsonStringify(param) {
-    this.before(function(opts, next) {
-        opts.args[param] = JSON.stringify(opts.args[param]);
-        next();
-    });
-});
-
-Decorators.add(function tryReferenceError() {
-    this.before(function(opts, next) {
-        opts.preventExecution = true;
-        opts.result = [];
-        try {
-            opts.result.push(opts.method.apply(opts.scope, opts.args))
-        } catch (e) {
-            opts.result.push("error");
-        } finally {
-            next();
-        }
-    });
-
-    this.last(function(opts, next) {
-        opts.result.push("lastExecution");
-        next();
-    });
-});
-
-Decorators.add(function appendResult() {
-    this.after(function(opts, next) {
-        opts.result.push("append...");
-        next();
-    });
+CoolProgrammer = Class.inherits(Programmer, {
+    constructor: ["override", function(parent, name, dborn, favouriteLanguage) {
+        parent(name, dborn, favouriteLanguage);
+    }],
+    run: function() {
+        return "IM FAST AS HELL!! GET OUT OF MY WAY!";
+    }
 });
 
 describe("functional testing 1", function() {
     before(function() {
-
-        Person = Class({
-            constructor: function(name, dborn) {
-                this.name = name;
-                this.dborn = dborn;
-            },
-            run: function() {
-                return "Im running!";
-            },
-            getAge: function() {
-                var currentYear = new Date()
-                    .getFullYear();
-                var yearBorn = this.dborn.getFullYear();
-                return currentYear - yearBorn;
-            }
-        });
-
         normalPerson = new Person("Tom", new Date(1978, 4, 11));
     });
 
@@ -120,28 +111,6 @@ describe("functional testing 1", function() {
 describe("functional testing 2", function() {
 
     before(function() {
-        Programmer = Class.inherits(Person, {
-            constructor: ["@override", function(parent, name, dborn, favouriteLanguage) {
-                parent(name, dborn);
-                this.favLang = favouriteLanguage;
-            }],
-            run: ["@override", function(parent) {
-                return parent() + " but... not as faster, coz im fat :/";
-            }],
-            code: function() {
-                return "Im codding in " + this.favLang;
-            }
-        });
-
-        CoolProgrammer = Class.inherits(Programmer, {
-            constructor: ["@override", function(parent, name, dborn, favouriteLanguage) {
-                parent(name, dborn, favouriteLanguage);
-            }],
-            run: function() {
-                return "IM FAST AS HELL!! GET OUT OF MY WAY!";
-            }
-        });
-
         normalPerson = new Person("Joe", new Date(1990, 2, 21));
         normalProgrammer = new Programmer("Mike", new Date(1982, 7, 18), "Java");
         coolProgrammer = new CoolProgrammer("Ivan", new Date(1990, 8, 22), "Javascript");
@@ -179,7 +148,7 @@ describe("functional testing 2", function() {
     });
 
 
-    it("built in annotation @override should import parent method as first argument", function() {
+    it("built in annotation override should import parent method as first argument", function() {
         assert.equal("Im running!", normalPerson.run());
         assert.equal("Im running! but... not as faster, coz im fat :/", normalProgrammer.run());
         assert.equal("IM FAST AS HELL!! GET OUT OF MY WAY!", coolProgrammer.run());
@@ -190,7 +159,7 @@ describe("create a new annotation that parses the first parameter that method re
 
     it("annotation functions can receive parameters to change their behavior", function() {
         DataParser = Class.static({
-            serialize: ["@jsonStringify: 0", function(serializedObject) {
+            serialize: ["jsonStringify: 0", function(serializedObject) {
                 return serializedObject;
             }]
         });
@@ -214,7 +183,7 @@ describe("create a new annotation that parses the first parameter that method re
     it("Decorators can run in background", function(done) {
         this.slow(1000);
         DataParser = Class.static({
-            ping: ["@xhrGet: 'google.es'", function(response) {
+            ping: ["xhrGet: 'google.es'", function(response) {
                 done();
             }]
         });
@@ -227,7 +196,7 @@ describe("extending JS native types", function() {
     var List, listInstance;
     before(function() {
         List = Class.inherits(Array, {
-            constructor: ["@override", function(parent) {
+            constructor: ["override", function(parent) {
                 parent();
             }],
             has: function(val) {
@@ -256,12 +225,12 @@ describe("Decorators could be placed anywhere in the array definition", function
     var Service;
     before(function() {
         Service = Class.static({
-            operation1: ["@log", function() {
+            operation1: ["log", function() {
                 Decorators.locals.aux.push("operation1");
             }],
             operation2: [function() {
                 Decorators.locals.aux.push("operation2");
-            }, "@log"]
+            }, "log"]
         });
     });
 
@@ -274,16 +243,16 @@ describe("Decorators could be placed anywhere in the array definition", function
     });
 });
 
-describe("Hooks `first` and `last`, flow control", function() {
+describe.skip("Hooks `first` and `last`, flow control", function() {
 
     var Service;
     before(function() {
         Service = Class.static({
-            myMethod: ["@tryReferenceError", function(fnName) {
+            myMethod: ["tryReferenceError", function(fnName) {
                 function aFunctionWhoDoesNothing() {}
                 return eval(fnName + "()");
-            }, "@appendResult"]
-        })
+            }, "appendResult"]
+        });
     });
 
     it("::myMethod will trigger an exception, should be captured", function() {
@@ -298,14 +267,33 @@ describe("multiple async operations", function() {
     it("should get google response and then asign to a new variable", function(done) {
         this.slow(1000);
         var MyService = Class.static({
-            asyncOperation: ["@xhrGet: 'google.es'", "@processResponse", function(response) {
+            asyncOperation: ["xhrGet: 'google.es'", "processResponse", function(response) {
                 if (response === "something") {
                     this.fn = done;
                 }
-            }, "@executeFn: 'fn'"]
+            }, "executeFn: 'fn'"]
         });
 
         MyService.asyncOperation();
 
+    });
+});
+
+describe("intro to instance phase decorators", function() {
+    var myDummyClass;
+    before(function() {
+        DummyClass = Class({
+            constructor: function(callback) {
+                this.endThisTest = callback;
+            },
+            handle: ["executeWhenCreated", function() {
+                this.endThisTest();
+            }]
+        });
+    });
+
+    it("should able to see their own context in instantiate  phase", function(done) {
+        this.slow(500);
+        new DummyClass(done);
     });
 });
