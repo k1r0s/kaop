@@ -2,8 +2,8 @@ var http = require("http");
 var emitter = new class Emitter extends require("events") {};
 var assert = require("assert");
 var main = require("../index");
-var Class = main.Class;
-var Decorators = main.Decorators;
+var klass = main.klass;
+var aspects = main.aspects;
 var Phase = main.Phase;
 
 var Person;
@@ -15,17 +15,17 @@ var normalPerson;
 var normalProgrammer;
 var coolProgrammer;
 
-Decorators.locals.http = http;
-Decorators.locals.aux = [];
+aspects.locals.http = http;
+aspects.locals.aux = [];
 
-Decorators.push(
+aspects.push(
     Phase.INSTANCE,
     function executeWhenCreated() {
         setTimeout(this[meta.methodName], 200);
     }
 );
 
-Decorators.push(
+aspects.push(
     Phase.EXECUTE,
     function xhrGet(host) {
         http.get({
@@ -58,7 +58,7 @@ Decorators.push(
     }
 );
 
-Person = Class({
+Person = klass({
     constructor: function(name, dborn) {
         this.name = name;
         this.dborn = dborn;
@@ -74,7 +74,7 @@ Person = Class({
     }
 });
 
-Programmer = Class.inherits(Person, {
+Programmer = klass.inherits(Person, {
     constructor: ["override", function(parent, name, dborn, favouriteLanguage) {
         parent(name, dborn);
         this.favLang = favouriteLanguage;
@@ -87,7 +87,7 @@ Programmer = Class.inherits(Person, {
     }
 });
 
-CoolProgrammer = Class.inherits(Programmer, {
+CoolProgrammer = klass.inherits(Programmer, {
     constructor: ["override", function(parent, name, dborn, favouriteLanguage) {
         parent(name, dborn, favouriteLanguage);
     }],
@@ -101,7 +101,7 @@ describe("functional testing 1", function() {
         normalPerson = new Person("Tom", new Date(1978, 4, 11));
     });
 
-    it("Person instance should have all class methods", function() {
+    it("Person instance should have all klass methods", function() {
         assert.strictEqual("Tom", normalPerson.name);
         assert.equal(39, normalPerson.getAge());
         assert.equal("Im running!", normalPerson.run());
@@ -116,7 +116,7 @@ describe("functional testing 2", function() {
         coolProgrammer = new CoolProgrammer("Ivan", new Date(1990, 8, 22), "Javascript");
     });
 
-    it("class instances should be objects with defined properties", function() {
+    it("klass instances should be objects with defined properties", function() {
         assert.equal("Joe", normalPerson.name);
         assert.equal("Mike", normalProgrammer.name);
         assert.equal("Ivan", coolProgrammer.name);
@@ -158,7 +158,7 @@ describe("functional testing 2", function() {
 describe("create a new annotation that parses the first parameter that method receives", function() {
 
     it("annotation functions can receive parameters to change their behavior", function() {
-        DataParser = Class.static({
+        DataParser = klass.statik({
             serialize: ["jsonStringify: 0", function(serializedObject) {
                 return serializedObject;
             }]
@@ -180,9 +180,9 @@ describe("create a new annotation that parses the first parameter that method re
 
         assert.strictEqual('{"some":1,"data":{"a":"test"},"asd":[{"y":6},{"y":"asdasd"},{"y":5}]}', DataParser.serialize(o));
     });
-    it("Decorators can run in background", function(done) {
+    it("aspects can run in background", function(done) {
         this.slow(1000);
-        DataParser = Class.static({
+        DataParser = klass.statik({
             ping: ["xhrGet: 'google.es'", function(response) {
                 done();
             }]
@@ -195,7 +195,7 @@ describe("create a new annotation that parses the first parameter that method re
 describe("extending JS native types", function() {
     var List, listInstance;
     before(function() {
-        List = Class.inherits(Array, {
+        List = klass.inherits(Array, {
             constructor: ["override", function(parent) {
                 parent();
             }],
@@ -221,25 +221,25 @@ describe("extending JS native types", function() {
     });
 });
 
-describe("Decorators could be placed anywhere in the array definition", function() {
+describe("aspects could be placed anywhere in the array definition", function() {
     var Service;
     before(function() {
-        Service = Class.static({
+        Service = klass.statik({
             operation1: ["log", function() {
-                Decorators.locals.aux.push("operation1");
+                aspects.locals.aux.push("operation1");
             }],
             operation2: [function() {
-                Decorators.locals.aux.push("operation2");
+                aspects.locals.aux.push("operation2");
             }, "log"]
         });
     });
 
-    it("should check if Decorators are executed given own position", function() {
+    it("should check if aspects are executed given own position", function() {
 
         Service.operation1();
         Service.operation2();
 
-        assert.strictEqual(Decorators.locals.aux.join(","), "logged,operation1,operation2,logged");
+        assert.strictEqual(aspects.locals.aux.join(","), "logged,operation1,operation2,logged");
     });
 });
 
@@ -247,7 +247,7 @@ describe.skip("Hooks `first` and `last`, flow control", function() {
 
     var Service;
     before(function() {
-        Service = Class.static({
+        Service = klass.statik({
             myMethod: ["tryReferenceError", function(fnName) {
                 function aFunctionWhoDoesNothing() {}
                 return eval(fnName + "()");
@@ -266,7 +266,7 @@ describe.skip("Hooks `first` and `last`, flow control", function() {
 describe("multiple async operations", function() {
     it("should get google response and then asign to a new variable", function(done) {
         this.slow(1000);
-        var MyService = Class.static({
+        var MyService = klass.statik({
             asyncOperation: ["xhrGet: 'google.es'", "processResponse", function(response) {
                 if (response === "something") {
                     this.fn = done;
@@ -279,10 +279,10 @@ describe("multiple async operations", function() {
     });
 });
 
-describe("intro to instance phase decorators", function() {
+describe("intro to instance phase aspects", function() {
     var myDummyClass;
     before(function() {
-        DummyClass = Class({
+        DummyClass = klass({
             constructor: function(callback) {
                 this.endThisTest = callback;
             },

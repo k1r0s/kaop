@@ -1,12 +1,12 @@
-var Decorators = require("./Decorators");
+var aspects = require("./aspects");
 var Phase = require("./Phase");
 
-var Class = function(sourceClass, extendedProperties, static) {
+var klass = function(sourceClass, extendedProperties, statik) {
 
     var inheritedProperties = Object.create(sourceClass.prototype);
 
     for (var propertyName in extendedProperties) {
-        inheritedProperties[propertyName] = Decorators.bootstrap({
+        inheritedProperties[propertyName] = aspects.bootstrap({
             phase: Phase.EXECUTE,
             sourceClass: sourceClass,
             propertyName: propertyName,
@@ -14,14 +14,14 @@ var Class = function(sourceClass, extendedProperties, static) {
         });
     }
 
-    if (!static) {
+    if (!statik) {
         var extendedClass = function() {
             try {
                 if (typeof this.constructor === "function") this.constructor.apply(this, arguments);
                 for (var propertyName in this) {
                     if (typeof this[propertyName] === "function") {
                         this[propertyName] = this[propertyName].bind(this);
-                        Decorators.bootstrap({
+                        aspects.bootstrap({
                             phase: Phase.INSTANCE,
                             instance: this,
                             propertyName: propertyName,
@@ -42,11 +42,11 @@ var Class = function(sourceClass, extendedProperties, static) {
 };
 
 var exp = function(mainProps) {
-    return Class(function() {}, mainProps);
+    return klass(function() {}, mainProps);
 };
-exp.inherits = Class;
-exp.static = function(mainProps) {
-    return Class(function() {}, mainProps, true);
+exp.inherits = klass;
+exp.statik = function(mainProps) {
+    return klass(function() {}, mainProps, true);
 };
 
 module.exports = exp;

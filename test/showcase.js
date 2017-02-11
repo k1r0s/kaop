@@ -8,19 +8,19 @@
 
 var assert = require("assert");
 var main = require("../index");
-var Class = main.Class;
-var Decorators = main.Decorators;
+var klass = main.klass;
+var aspects = main.aspects;
 var Phase = main.Phase;
 
-Decorators.locals.myCoolService = $$myCoolService = 1;
+aspects.locals.myCoolService = $$myCoolService = 1;
 
 /**
  * decorator - function sendResult
  * this decorator send an API request
- * related with the targeted class instance
+ * related with the targeted klass instance
  */
 
-Decorators.push(
+aspects.push(
     Phase.EXECUTE,
     function save() {
         if (!meta.result) {
@@ -48,7 +48,7 @@ Decorators.push(
  * this decorator serializes the targeted instance
  */
 
-Decorators.push(
+aspects.push(
     Phase.EXECUTE,
     function serialize() {
         if (!meta.result) {
@@ -58,7 +58,7 @@ Decorators.push(
         // opts.result is the returned value at the
         // current point of flow
         //
-        // opts.scope is the current instance of decorated class
+        // opts.scope is the current instance of decorated klass
         meta.result = JSON.stringify(this.attributes);
         next();
     });
@@ -71,16 +71,16 @@ Decorators.push(
  * param  {string} nameContext method to be executed
  */
 
-Decorators.push(
+aspects.push(
     Phase.EXECUTE,
     function defer(nameContext) {
         eval("this." + nameContext + "(meta.methodName)");
     });
 
 /**
- * class ExampleModel
+ * klass ExampleModel
  */
-var ExampleModel = Class({
+var ExampleModel = klass({
 
     /**
      * property actionsPool
@@ -147,7 +147,7 @@ var ExampleModel = Class({
      * param {string} key the unique id of that property
      * param {any} value
      *
-     * decorators serialize, save, triggerChange
+     * aspects serialize, save, triggerChange
      */
     set: [function(key, value) {
         if (this.attributes[key] !== value) {
