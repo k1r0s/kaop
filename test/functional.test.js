@@ -1,5 +1,5 @@
 var http = require("http");
-var emitter = new class Emitter extends require("events") {};
+var emitter = new(class Emitter extends require("events") {});
 var assert = require("assert");
 var main = require("../index");
 var klass = main.klass;
@@ -97,7 +97,7 @@ CoolProgrammer = klass.inherits(Programmer, {
 });
 
 describe("functional testing 1", function() {
-    before(function() {
+    beforeAll(function() {
         normalPerson = new Person("Tom", new Date(1978, 4, 11));
     });
 
@@ -110,7 +110,7 @@ describe("functional testing 1", function() {
 
 describe("functional testing 2", function() {
 
-    before(function() {
+    beforeAll(function() {
         normalPerson = new Person("Joe", new Date(1990, 2, 21));
         normalProgrammer = new Programmer("Mike", new Date(1982, 7, 18), "Java");
         coolProgrammer = new CoolProgrammer("Ivan", new Date(1990, 8, 22), "Javascript");
@@ -181,7 +181,6 @@ describe("create a new annotation that parses the first parameter that method re
         assert.strictEqual('{"some":1,"data":{"a":"test"},"asd":[{"y":6},{"y":"asdasd"},{"y":5}]}', DataParser.serialize(o));
     });
     it("aspects can run in background", function(done) {
-        this.slow(1000);
         DataParser = klass.statik({
             ping: ["xhrGet: 'google.es'", function(response) {
                 done();
@@ -194,7 +193,7 @@ describe("create a new annotation that parses the first parameter that method re
 
 describe("extending JS native types", function() {
     var List, listInstance;
-    before(function() {
+    beforeAll(function() {
         List = klass.inherits(Array, {
             constructor: ["override", function(parent) {
                 parent();
@@ -223,7 +222,7 @@ describe("extending JS native types", function() {
 
 describe("aspects could be placed anywhere in the array definition", function() {
     var Service;
-    before(function() {
+    beforeAll(function() {
         Service = klass.statik({
             operation1: ["log", function() {
                 aspects.locals.aux.push("operation1");
@@ -246,7 +245,7 @@ describe("aspects could be placed anywhere in the array definition", function() 
 describe.skip("Hooks `first` and `last`, flow control", function() {
 
     var Service;
-    before(function() {
+    beforeAll(function() {
         Service = klass.statik({
             myMethod: ["tryReferenceError", function(fnName) {
                 function aFunctionWhoDoesNothing() {}
@@ -265,7 +264,6 @@ describe.skip("Hooks `first` and `last`, flow control", function() {
 
 describe("multiple async operations", function() {
     it("should get google response and then asign to a new variable", function(done) {
-        this.slow(1000);
         var MyService = klass.statik({
             asyncOperation: ["xhrGet: 'google.es'", "processResponse", function(response) {
                 if (response === "something") {
@@ -281,7 +279,7 @@ describe("multiple async operations", function() {
 
 describe("intro to instance phase aspects", function() {
     var myDummyClass;
-    before(function() {
+    beforeAll(function() {
         DummyClass = klass({
             constructor: function(callback) {
                 this.endThisTest = callback;
@@ -293,7 +291,6 @@ describe("intro to instance phase aspects", function() {
     });
 
     it("should able to see their own context in instantiate  phase", function(done) {
-        this.slow(500);
         new DummyClass(done);
     });
 });

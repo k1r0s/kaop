@@ -109,7 +109,7 @@ describe("aspects::add, ::names, ::getDecoratorFn", function() {
 
 describe("aspects:: iterations", function() {
     var testImplementation;
-    before(function() {
+    beforeAll(function() {
         testImplementation = ["prop1", "prop3", function() {}];
     });
     it("should get only aspects added in execution phase", function() {
