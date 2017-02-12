@@ -1,32 +1,45 @@
 {
-  "name": "kaop",
-  "version": "2.5.0",
-  "description": "simple js OOP/AOP lib helper with classes, inheritance and method aspects (method interceptors)",
-  "main": "index.js",
-  "scripts": {
-    "test": "jest",
-    "dist": "browserify ./index.js -o ./dist/kaop-lib.dev.js && uglifyjs ./dist/kaop-lib.dev.js --compress --mangle --keep-fnames --output ./dist/kaop-lib.min.js",
-    "preversion": "npm run dist"
-  },
-  "keywords": [
-    "framework",
-    "helper",
-    "oop",
-    "aop"
-  ],
-  "author": "ciroreed",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ciroreed/kaop.git"
-  },
-  "homepage": "https://github.com/ciroreed/kaop",
-  "bugs": {
-    "url": "https://github.com/ciroreed/kaop/issues"
-  },
-  "license": "ISC",
-  "devDependencies": {
-    "jest": "^18.1.0",
-    "mocha": "^3.1.2",
-    "uglifyjs": "^2.4.10"
-  }
+    "name": "kaop",
+    "version": "2.5.0",
+    "description": "simple js OOP/AOP lib helper with classes, inheritance and method aspects (method interceptors)",
+    "main": "index.js",
+    "scripts": {
+        "test": "jest",
+        "dist": "browserify ./index.js -o ./dist/kaop-lib.dev.js && uglifyjs ./dist/kaop-lib.dev.js --compress --mangle --keep-fnames --output ./dist/kaop-lib.min.js",
+        "preversion": "npm run dist"
+    },
+    "keywords": [
+        "framework",
+        "helper",
+        "oop",
+        "aop"
+    ],
+    "author": "ciroreed",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ciroreed/kaop.git"
+    },
+    "homepage": "https://github.com/ciroreed/kaop",
+    "bugs": {
+        "url": "https://github.com/ciroreed/kaop/issues"
+    },
+    "jest": {
+        "transform": {
+            ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+        },
+        "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+        "moduleFileExtensions": [
+            "ts",
+            "tsx",
+            "js"
+        ]
+    },
+    "license": "ISC",
+    "devDependencies": {
+        "browserify": "^14.0.0",
+        "jest": "^18.1.0",
+        "ts-jest": "^18.0.3",
+        "typescript": "^2.1.6",
+        "uglifyjs": "^2.4.10"
+    }
 }

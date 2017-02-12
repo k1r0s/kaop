@@ -1,7 +1,7 @@
 var http = require("http");
 var emitter = new(class Emitter extends require("events") {});
 var assert = require("assert");
-var main = require("../index");
+var main = require("../index.js");
 var klass = main.klass;
 var aspects = main.aspects;
 var Phase = main.Phase;

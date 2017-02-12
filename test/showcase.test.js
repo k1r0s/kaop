@@ -7,7 +7,7 @@
  */
 
 var assert = require("assert");
-var main = require("../index");
+var main = require("../index.js");
 var klass = main.klass;
 var aspects = main.aspects;
 var Phase = main.Phase;
