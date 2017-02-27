@@ -1,7 +1,7 @@
 # kaop
 
 ![Image travis]
-(https://api.travis-ci.org/ciroreed/kaop.svg?branch=master)
+(https://travis-ci.org/k1r0s/kaop.svg?branch=master)
 
 update: a detailed [brew showcase](https://github.com/ciroreed/kaop/blob/master/test/showcase.js) is included in test dir.
 
