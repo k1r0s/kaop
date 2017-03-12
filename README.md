@@ -5,9 +5,13 @@
 
 update: a detailed [brew showcase](https://github.com/ciroreed/kaop/blob/master/test/showcase.js) is included in test dir.
 
-This library has a lot of combinations. There are more than 25 examples running at `test` dir... This description try to explain some basic concepts. Advanced users probably will not find too much help about its capabilities.
+Bring the benefits of AOP to Javascript: https://en.wikipedia.org/wiki/Aspect-oriented_programming
 
 Kaop is a light package to provide OOP/AOP patterns, which enables several features such save code, enhance readability, and also provide an alternative to use the lowest JS version (in browsers world) with top features:
+
+This library is a ground tool-kit to enhance code design in JS, using decorator pattern.
+
+Here I try to explain some basic concepts:
 
 ## Contents
 
@@ -19,7 +23,6 @@ Kaop is a light package to provide OOP/AOP patterns, which enables several featu
 ```javascript
 var Class = require("kaop").Class
 ```
-
 -`Class(properties)` is a function which returns a fn constructor that implements defined properties as a class definition.
 
 -`Class.inherits(SuperClass, SubClass properties)` extend the SuperClass properties replacing if they have the same key/name.. we can override methods with the built in decorator `override` (recursively through upper classes (trust me!)).
@@ -48,7 +51,7 @@ To create a new instance from Person we need to to this:
 // new Person
 var simplePerson = new Person("Joe", new Date(1990))
 // simplePerson.name outputs > "Joe"
-// simplePerson.getAge outputs > 26 (coz howadays we're in 2016)
+// simplePerson.getAge outputs > 27 (coz howadays we're in 2017)
 
 ```
 Now we're going to extend `Person` to another subClass called `Programmer`:
@@ -72,50 +75,89 @@ As you may wonder Programmer `constructor` overrides super (or parent) construct
 
 > Note that if you declare a constructor in subClass you must override the parent constructor. If u dont override it, may we receive an unespected behavior (if you dont override it u're just replacing the parent constructor, so it may work, but ... probably is not what you want :|).
 
-Note that we're using `override` decorator to get superClass method in the subClass method, if we remove the override from the method we're just replacing the method, so be aware of this!.
+Note that we're using `override` Advice to get superClass method in the subClass method, if we remove the override from the method we're just replacing the method, so be aware of this!.
 
 ### Method Advices
 
 ```javascript
 var Advices = require("kaop").Advices
 ```
-`Advices.add(function decoratorName(){  ....  })` provides a way to add new features to your app, Advices can modify class methods.
+`Advices.add(function AdviceName(){  ....  })` provides a way to add new features to your app, Advices can modify class methods.
 
-Having this one:
+> The most boring example .. LOGS
+
 ```javascript
-Advices.add(function jsonStringify(){
-  this.place(function(opts, next){
-    opts.result = JSON.stringify(opts.scope);
-    next();
-    //or this.next()
-  })
+Advices.add(function log(){
+    console.log(meta.methodName + " called");
+    console.log("with arguments: " + meta.args);
+    console.log("returned: " + meta.result);
 })
 ```
 And then:
 ```javascript
-CoolProgrammer = extend(Programmer, {
-  constructor: ["override", function(parent, name, dborn, favouriteLanguage){ //method recursive override
-    parent(name, dborn, favouriteLanguage)
-  }],
-  run: function(){ //parent method replacement
-    return "IM FAST AS HELL!! GET OUT OF MY WAY!"
-  },
-  serialize: [function(){
-      //some stuff
-      //
-      // ...
-  }, "jsonStringify"]
+MyService = Class.static({
+    myBorginOperation: [function(some, thing){
+        // stuff...
+        return some + thing;
+    }, "log"]
 })
-```
-Note that in the previous sample there is a `serialize` method that has `jsonStringify` decorator (placed at the end of the declaration, so it will be executed AFTER method execution)...
 
-> NOTE! Advices could be placed at the beginning or at the end. This is optional because you always can use hooks in decorator declaration. A method can be decorated multiple times and Advices can support multiple hooks within. Anyway you can place Advices at some possition to be more dynamic when declare new classes.
-So the following code does this:
+```
+> NOTE! The execution of the advice will depend on advice's
+position (implementation). In previous example 'log' advice
+is implemented right after method declaration (method stack), so
+it will be executed after the method call.
 
 ```javascript
-var coolp = new CoolProgrammer("Jon Doe", new Date(1990, 8, 22), "Javascript")
-coolp.serialize() //outputs a string with the serialized instance..
+MyService.myBorginOperation(3, 54); //57
+//logs:
+// 'myBorginOperation called'
+// with arguments: 3, 54
+// returned: 57
 ```
+... but most of our code base is often asynchronous, right?
+
+You can stack advices over methods like this way:
+```javascript
+MyService = Class.static({
+    myBorginOperation: ["myAsyncTask1", "myAsyncTask2", function(some, thing){
+        // stuff...
+        return some + thing;
+    }]
+})
+```
+You're used to declare 'next' callback in advice declaration, if you do so
+the next advice in the callstack will be delayed until 'next' is called.
+
+Imagine you have a service responsible to perform AJAX calls and you want
+to apply IoC in your codebase:
+```javascript
+Advices.add(
+    //we're going to skip how the service is used, just imagine that $$myAjaxService works
+    function xhrGet(url){ //note that this advice can be parameterized
+        $$myAjaxService.get(url + "/" + meta.args[0]) //url will be any string
+        .then(function(response){ // success
+            meta.args.push(response);
+            // we get the response, but isn't the place to deal with it (*)
+            next(); // dispatch the next advice, or method
+        });
+    }
+)
+```
+In the previous example, we define an advice responsible to receive an argument,
+then perform a request to get that resource/url..
+when request is success it will place the response as the first parameter
+and dispatch to the following advice or method.
+
+```javascript
+SomeBusinessTopic = Class({
+    loadTaxes: ["xhrGet: '/taxes/'", function(country, taxes){
+        //taxes is the response from the server
+    }]
+})
+SomeBusinessTopic.loadTaxes('india'); //will perform a request GET: /taxes/india
+```
+The implementation is clear enough.
 
 ### YOLO
 
@@ -123,41 +165,37 @@ As you may wonder Advices support **chained** asynchronous calls because they ar
 
 Multiple Advices for the same method are allowed. You might use hooks inside decorator declaration to control when the decorator will be executed, you can also define multiple hooks in the same decorator:
 
-> NOTE! to use custom objects/services (user defined variables) inside Advices you must define it as properties of Advices::locals. IE: var myCoolService = {cool: 'stuff'}; and then you try to use that inside an decorator it will give an reference error unless you do Advices.locals.myCoolService = myCoolService.  
+> NOTE! to use custom objects/services (user defined variables)
+ inside Advices you must define it as properties of Advices::locals.
+ IE: var myCoolService = {cool: 'stuff'}; and then you try to use
+ that inside an decorator it will give an reference error unless you
+ do Advices.locals.myCoolService = myCoolService.  
 
 ```javascript
-Advices.add(function save(index){
-  // hooks
-  // this.before(function(opts, next){
-  // this.after(function(opts, next){
-  // this.place(function(opts, next){
-  // this.first(function(opts, next){
-  // this.last(function(opts, next){
-  this.after(function(opts, next){
-    //this method will be executed AFTER the annotated method return it result, so we can
-    //perform several actions with it (with the result or what ever is defined in the
-    //method)
+Advices.add(
+    function save(index){ //arguments are defined in implementation. 'save: 3'
 
-    // stuff...
+        meta.args //contains the arguments or parameters that the method receives
+        meta.result //contains the returned value
+        meta.scope //it used to be `this` inside the method, so its the instance itself
+        meta.parentScope //gives you access to the parent prototype or.. how `override` works
+        meta.method //it will be executed after all the befores hooks have been consumed
+        meta.methodName //the method name string, for tracking purposes.. or any
+        //TODO: meta.preventExecution //check branch 'old-master'
+        // if we asign a truthy value in `before` phase, main method will never be call
 
-    opts.args //contains the arguments or parameters that the method receives
-    opts.result //contains the returned value
-    opts.scope //it used to be `this` inside the method, so its the instance itself
-    opts.parentScope //gives you access to the parent prototype or.. how `override` works
-    opts.method //it will be executed after all the befores hooks have been consumed
-    opts.methodName //the method name string, for tracking purposes.. or any
-    opts.preventExecution //if we asign a truthy value in `before` phase, decorated method will not be called
+        next() // When called, next advice or method will be invoked..
+        // if next is not defined the advice execution will be synchronous
+        // stuff...
 
-    next() //MANDATORY call next. When called, next hook or action will trigger..
-    // stuff...
 
-    // asynchronous example
-    myService.post("myEndPoint").success(function(){
-      // stuff...
-      next() //so the next execution wait until next is called
-    })
-  })
-})
+        // asynchronous example
+        myService.post("myEndPoint").success(function(){
+          // stuff...
+          next(); //so the next execution wait until next is called
+        })
+    }
+)
 ```
 
 #TODO
