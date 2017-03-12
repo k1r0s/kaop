@@ -3,11 +3,15 @@
 ![Image travis]
 (https://travis-ci.org/k1r0s/kaop.svg?branch=master)
 
+Kaop is a light package to provide OOP/AOP patterns, also provide an alternative to use the lowest JS version (in browsers world) with top features:
+---
+[Kaop alpha TS version](https://github.com/k1r0s/kaop-ts) using ES7 decorators
+
+[MUST SEE](https://k1r0s.github.io/aop-intro/)
+
 update: a detailed [brew showcase](https://github.com/ciroreed/kaop/blob/master/test/showcase.js) is included in test dir.
 
 Bring the benefits of AOP to Javascript: https://en.wikipedia.org/wiki/Aspect-oriented_programming
-
-Kaop is a light package to provide OOP/AOP patterns, which enables several features such save code, enhance readability, and also provide an alternative to use the lowest JS version (in browsers world) with top features:
 
 This library is a ground tool-kit to enhance code design in JS, using decorator pattern.
 
@@ -15,10 +19,10 @@ Here I try to explain some basic concepts:
 
 ## Contents
 
-- [Classes and inheritance](#classes-and-inheritance)
-- [Method Advices](#method-Advices)
+- [Classes and Inheritance](#classes-and-inheritance)
+- [Method Advices](#method-advices)
 
-### Classes and Inheritance
+### Classes and Inheritance (why use Babel)
 
 ```javascript
 var Class = require("kaop").Class
