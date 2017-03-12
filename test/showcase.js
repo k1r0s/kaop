@@ -9,10 +9,9 @@
 var assert = require("assert");
 var main = require("../index");
 var Class = main.Class;
-var Decorators = main.Decorators;
-var Phase = main.Phase;
+var Advices = main.Advices;
 
-Decorators.locals.myCoolService = $$myCoolService = 1;
+Advices.locals.myCoolService = $$myCoolService = 1;
 
 /**
  * decorator - function sendResult
@@ -20,8 +19,7 @@ Decorators.locals.myCoolService = $$myCoolService = 1;
  * related with the targeted class instance
  */
 
-Decorators.push(
-    Phase.EXECUTE,
+Advices.add(
     function save() {
         if (!meta.result) {
             next();
@@ -48,8 +46,7 @@ Decorators.push(
  * this decorator serializes the targeted instance
  */
 
-Decorators.push(
-    Phase.EXECUTE,
+Advices.add(
     function serialize() {
         if (!meta.result) {
             next();
@@ -71,8 +68,7 @@ Decorators.push(
  * param  {string} nameContext method to be executed
  */
 
-Decorators.push(
-    Phase.EXECUTE,
+Advices.add(
     function defer(nameContext) {
         eval("this." + nameContext + "(meta.methodName)");
     });
@@ -147,7 +143,7 @@ var ExampleModel = Class({
      * param {string} key the unique id of that property
      * param {any} value
      *
-     * decorators serialize, save, triggerChange
+     * Advices serialize, save, triggerChange
      */
     set: [function(key, value) {
         if (this.attributes[key] !== value) {

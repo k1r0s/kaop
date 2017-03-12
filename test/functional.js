@@ -3,8 +3,7 @@ var emitter = new class Emitter extends require("events") {};
 var assert = require("assert");
 var main = require("../index");
 var Class = main.Class;
-var Decorators = main.Decorators;
-var Phase = main.Phase;
+var Advices = main.Advices;
 
 var Person;
 var Programmer;
@@ -15,18 +14,16 @@ var normalPerson;
 var normalProgrammer;
 var coolProgrammer;
 
-Decorators.locals.http = http;
-Decorators.locals.aux = [];
+Advices.locals.http = http;
+Advices.locals.aux = [];
 
-Decorators.push(
-    Phase.INSTANCE,
+Advices.add(
     function executeWhenCreated() {
         setTimeout(this[meta.methodName], 200);
     }
 );
 
-Decorators.push(
-    Phase.EXECUTE,
+Advices.add(
     function xhrGet(host) {
         http.get({
             host: host
@@ -180,7 +177,7 @@ describe("create a new annotation that parses the first parameter that method re
 
         assert.strictEqual('{"some":1,"data":{"a":"test"},"asd":[{"y":6},{"y":"asdasd"},{"y":5}]}', DataParser.serialize(o));
     });
-    it("Decorators can run in background", function(done) {
+    it("Advices can run asynchronous", function(done) {
         this.slow(1000);
         DataParser = Class.static({
             ping: ["xhrGet: 'google.es'", function(response) {
@@ -196,9 +193,6 @@ describe("extending JS native types", function() {
     var List, listInstance;
     before(function() {
         List = Class.inherits(Array, {
-            constructor: ["override", function(parent) {
-                parent();
-            }],
             has: function(val) {
                 return this.indexOf(val) > -1;
             }
@@ -221,45 +215,25 @@ describe("extending JS native types", function() {
     });
 });
 
-describe("Decorators could be placed anywhere in the array definition", function() {
+describe("Advices could be placed anywhere in the array definition", function() {
     var Service;
     before(function() {
         Service = Class.static({
             operation1: ["log", function() {
-                Decorators.locals.aux.push("operation1");
+                Advices.locals.aux.push("operation1");
             }],
             operation2: [function() {
-                Decorators.locals.aux.push("operation2");
+                Advices.locals.aux.push("operation2");
             }, "log"]
         });
     });
 
-    it("should check if Decorators are executed given own position", function() {
+    it("should check if Advices are executed given own position", function() {
 
         Service.operation1();
         Service.operation2();
 
-        assert.strictEqual(Decorators.locals.aux.join(","), "logged,operation1,operation2,logged");
-    });
-});
-
-describe.skip("Hooks `first` and `last`, flow control", function() {
-
-    var Service;
-    before(function() {
-        Service = Class.static({
-            myMethod: ["tryReferenceError", function(fnName) {
-                function aFunctionWhoDoesNothing() {}
-                return eval(fnName + "()");
-            }, "appendResult"]
-        });
-    });
-
-    it("::myMethod will trigger an exception, should be captured", function() {
-        assert.strictEqual(Service.myMethod("kajsdasdasdsadh").join(","), "error,append...,lastExecution");
-    });
-    it("::myMethod will not trigger any exception", function() {
-        assert.strictEqual(Service.myMethod("aFunctionWhoDoesNothing").join(","), ",append...,lastExecution");
+        assert.strictEqual(Advices.locals.aux.join(","), "logged,operation1,operation2,logged");
     });
 });
 
@@ -276,24 +250,5 @@ describe("multiple async operations", function() {
 
         MyService.asyncOperation();
 
-    });
-});
-
-describe("intro to instance phase decorators", function() {
-    var myDummyClass;
-    before(function() {
-        DummyClass = Class({
-            constructor: function(callback) {
-                this.endThisTest = callback;
-            },
-            handle: ["executeWhenCreated", function() {
-                this.endThisTest();
-            }]
-        });
-    });
-
-    it("should able to see their own context in instantiate  phase", function(done) {
-        this.slow(500);
-        new DummyClass(done);
     });
 });

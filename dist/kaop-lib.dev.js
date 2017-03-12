@@ -1,33 +1,33 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var Class = require("./src/Class");
-var Decorators = require("./src/Decorators");
+var Advices = require("./src/Advices");
 var Phase = require("./src/Phase");
 
 if (typeof module === "object") {
     module.exports = {
         Class: Class,
-        Decorators: Decorators,
+        Advices: Advices,
         Phase: Phase
     };
 } else {
     window.Class = Class;
-    window.Decorators = Decorators;
+    window.Advices = Advices;
     window.Phase = Phase;
 }
 
 /**
- * built in decorators
+ * built in Advices
  */
 
-Decorators.push(
+Advices.push(
     Phase.EXECUTE,
     function override() {
         meta.args.unshift(meta.parentScope[meta.methodName].bind(this));
     }
 );
 
-},{"./src/Class":2,"./src/Decorators":3,"./src/Phase":4}],2:[function(require,module,exports){
-var Decorators = require("./Decorators");
+},{"./src/Class":2,"./src/Advices":3,"./src/Phase":4}],2:[function(require,module,exports){
+var Advices = require("./Advices");
 var Phase = require("./Phase");
 
 var Class = function(sourceClass, extendedProperties, static) {
@@ -35,7 +35,7 @@ var Class = function(sourceClass, extendedProperties, static) {
     var inheritedProperties = Object.create(sourceClass.prototype);
 
     for (var propertyName in extendedProperties) {
-        inheritedProperties[propertyName] = Decorators.bootstrap({
+        inheritedProperties[propertyName] = Advices.bootstrap({
             phase: Phase.EXECUTE,
             sourceClass: sourceClass,
             propertyName: propertyName,
@@ -50,7 +50,7 @@ var Class = function(sourceClass, extendedProperties, static) {
                 for (var propertyName in this) {
                     if (typeof this[propertyName] === "function") {
                         this[propertyName] = this[propertyName].bind(this);
-                        Decorators.bootstrap({
+                        Advices.bootstrap({
                             phase: Phase.INSTANCE,
                             instance: this,
                             propertyName: propertyName,
@@ -80,10 +80,10 @@ exp.static = function(mainProps) {
 
 module.exports = exp;
 
-},{"./Decorators":3,"./Phase":4}],3:[function(require,module,exports){
+},{"./Advices":3,"./Phase":4}],3:[function(require,module,exports){
 var Phase = require("./Phase");
 
-module.exports = Decorators = {
+module.exports = Advices = {
     locals: {},
     executionArr: [],
     instantiationArr: [],
@@ -91,9 +91,9 @@ module.exports = Decorators = {
         var phase = arguments[0];
         for (var i = 1; i < arguments.length; i++) {
             if (phase === Phase.INSTANCE) {
-                Decorators.instantiationArr.push(arguments[i]);
+                Advices.instantiationArr.push(arguments[i]);
             } else if (phase === Phase.EXECUTE) {
-                Decorators.executionArr.push(arguments[i]);
+                Advices.executionArr.push(arguments[i]);
             }
         }
     },
@@ -109,32 +109,32 @@ module.exports = Decorators = {
         }
 
         var transpiledFunction = "(function(" + functionArguments + ")\n{ " + functionBody + " \n})";
-        with(Decorators.locals) {
+        with(Advices.locals) {
             return eval(transpiledFunction);
         }
     },
     getExecutionIteration: function(rawImplementation) {
-        return rawImplementation.filter(Decorators.notInInstantiatePhase);
+        return rawImplementation.filter(Advices.notInInstantiatePhase);
     },
     getInstantiationIteration: function(rawImplementation) {
-        return rawImplementation.filter(Decorators.notInExecutionPhase);
+        return rawImplementation.filter(Advices.notInExecutionPhase);
     },
     notInInstantiatePhase: function(decoratorImplementation) {
-        return typeof decoratorImplementation === "function" || !Decorators.instantiationArr
+        return typeof decoratorImplementation === "function" || !Advices.instantiationArr
             .map(function(decorator) {
                 return decorator.name;
             })
             .some(function(decoratorName) {
-                return Decorators.getDecoratorNameByImplementation(decoratorImplementation) === decoratorName;
+                return Advices.getDecoratorNameByImplementation(decoratorImplementation) === decoratorName;
             });
     },
     notInExecutionPhase: function(decoratorImplementation) {
-        return typeof decoratorImplementation !== "function" && !Decorators.executionArr
+        return typeof decoratorImplementation !== "function" && !Advices.executionArr
             .map(function(decorator) {
                 return decorator.name;
             })
             .some(function(decoratorName) {
-                return Decorators.getDecoratorNameByImplementation(decoratorImplementation) === decoratorName;
+                return Advices.getDecoratorNameByImplementation(decoratorImplementation) === decoratorName;
             });
     },
     differentFromFunction: function(item) {
@@ -151,21 +151,21 @@ module.exports = Decorators = {
         });
     },
     getDecoratorFn: function(fname) {
-        return Decorators.getAllDefinitions().find(function(dec) {
+        return Advices.getAllDefinitions().find(function(dec) {
             return dec.name === fname;
         });
     },
     getAllDefinitions: function() {
-        return Decorators.executionArr.concat(Decorators.instantiationArr);
+        return Advices.executionArr.concat(Advices.instantiationArr);
     },
     isRightImplemented: function(array) {
-        var completeDecoratorArrayNames = Decorators.getAllDefinitions()
+        var completeDecoratorArrayNames = Advices.getAllDefinitions()
             .map(function(decorator) {
                 return decorator.name;
             });
         return array
-            .filter(Decorators.differentFromFunction)
-            .map(Decorators.getDecoratorNameByImplementation)
+            .filter(Advices.differentFromFunction)
+            .map(Advices.getDecoratorNameByImplementation)
             .every(function(implementationName) {
                 return completeDecoratorArrayNames.indexOf(implementationName) > -1;
             });
@@ -179,8 +179,8 @@ module.exports = Decorators = {
     bootstrap: function(config) {
         if (!(
                 config.propertyValue &&
-                Decorators.isValidStructure(config.propertyValue) &&
-                Decorators.isRightImplemented(config.propertyValue)
+                Advices.isValidStructure(config.propertyValue) &&
+                Advices.isRightImplemented(config.propertyValue)
             )) {
             return config.propertyValue;
         }
@@ -189,7 +189,7 @@ module.exports = Decorators = {
             return function() {
 
                 var executionProps = {
-                    method: Decorators.getDecoratedMethod(config.propertyValue),
+                    method: Advices.getDecoratedMethod(config.propertyValue),
                     methodName: config.propertyName,
                     scope: this,
                     parentScope: config.sourceClass.prototype,
@@ -197,17 +197,17 @@ module.exports = Decorators = {
                     result: undefined
                 };
 
-                new methodExecutionIteration(Decorators.getExecutionIteration(config.propertyValue), executionProps);
+                new methodExecutionIteration(Advices.getExecutionIteration(config.propertyValue), executionProps);
 
                 return executionProps.result;
             };
         } else if (config.phase === Phase.INSTANCE) {
             var instantiateProps = {
-                method: Decorators.getDecoratedMethod(config.propertyValue),
+                method: Advices.getDecoratedMethod(config.propertyValue),
                 methodName: config.propertyName,
                 scope: config.instance
             };
-            new methodInstantiationIteration(Decorators.getInstantiationIteration(config.propertyValue), instantiateProps);
+            new methodInstantiationIteration(Advices.getInstantiationIteration(config.propertyValue), instantiateProps);
         }
     }
 };
@@ -220,10 +220,10 @@ var methodInstantiationIteration = function(definitionArray, props) {
     this.step = function() {
         this.index++;
         var currentStep = definitionArray[this.index];
-        var stepFunctionName = Decorators.getDecoratorNameByImplementation(currentStep);
-        var stepArguments = Decorators.getDecoratorArgumentsByImplementation(currentStep);
-        var rawDecorator = Decorators.getDecoratorFn(stepFunctionName);
-        var decoratedMethod = Decorators.transpileMethod(rawDecorator, props, arguments.callee.bind(this));
+        var stepFunctionName = Advices.getDecoratorNameByImplementation(currentStep);
+        var stepArguments = Advices.getDecoratorArgumentsByImplementation(currentStep);
+        var rawDecorator = Advices.getDecoratorFn(stepFunctionName);
+        var decoratedMethod = Advices.transpileMethod(rawDecorator, props, arguments.callee.bind(this));
         if (stepArguments) {
             eval("decoratedMethod.call(props.scope, " + stepArguments + ")");
         } else {
@@ -245,10 +245,10 @@ var methodExecutionIteration = function(definitionArray, props) {
             props.result = currentStep.apply(props.scope, props.args);
             this.step();
         } else if (typeof currentStep === "string") {
-            var stepFunctionName = Decorators.getDecoratorNameByImplementation(currentStep);
-            var stepArguments = Decorators.getDecoratorArgumentsByImplementation(currentStep);
-            var rawDecorator = Decorators.getDecoratorFn(stepFunctionName);
-            var decoratedMethod = Decorators.transpileMethod(rawDecorator, props, arguments.callee.bind(this));
+            var stepFunctionName = Advices.getDecoratorNameByImplementation(currentStep);
+            var stepArguments = Advices.getDecoratorArgumentsByImplementation(currentStep);
+            var rawDecorator = Advices.getDecoratorFn(stepFunctionName);
+            var decoratedMethod = Advices.transpileMethod(rawDecorator, props, arguments.callee.bind(this));
             if (stepArguments) {
                 eval("decoratedMethod.call(props.scope, " + stepArguments + ")");
             } else {

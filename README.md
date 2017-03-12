@@ -12,7 +12,7 @@ Kaop is a light package to provide OOP/AOP patterns, which enables several featu
 ## Contents
 
 - [Classes and inheritance](#classes-and-inheritance)
-- [Method decorators](#method-decorators)
+- [Method Advices](#method-Advices)
 
 ### Classes and Inheritance
 
@@ -24,7 +24,7 @@ var Class = require("kaop").Class
 
 -`Class.inherits(SuperClass, SubClass properties)` extend the SuperClass properties replacing if they have the same key/name.. we can override methods with the built in decorator `override` (recursively through upper classes (trust me!)).
 
--`Class.static(properties)` returns a plain object with the given properties like plain JavaScript does, we may use this only to enable Decorators.
+-`Class.static(properties)` returns a plain object with the given properties like plain JavaScript does, we may use this only to enable Advices.
 
 ```javascript
 var Person = Class({
@@ -55,7 +55,7 @@ Now we're going to extend `Person` to another subClass called `Programmer`:
 
 ```javascript
 Programmer = Class.inherits(Person, {
-  //decorators override inject the SuperClass.constructor as the first parameter
+  //Advices override inject the SuperClass.constructor as the first parameter
   constructor: ["override", function(parent, name, dborn, favouriteLanguage){
     parent(name, dborn) //calling it we can save a lot of code
     this.favLang = favouriteLanguage
@@ -74,16 +74,16 @@ As you may wonder Programmer `constructor` overrides super (or parent) construct
 
 Note that we're using `override` decorator to get superClass method in the subClass method, if we remove the override from the method we're just replacing the method, so be aware of this!.
 
-### Method decorators
+### Method Advices
 
 ```javascript
-var Decorators = require("kaop").Decorators
+var Advices = require("kaop").Advices
 ```
-`Decorators.add(function decoratorName(){  ....  })` provides a way to add new features to your app, Decorators can modify class methods.
+`Advices.add(function decoratorName(){  ....  })` provides a way to add new features to your app, Advices can modify class methods.
 
 Having this one:
 ```javascript
-Decorators.add(function jsonStringify(){
+Advices.add(function jsonStringify(){
   this.place(function(opts, next){
     opts.result = JSON.stringify(opts.scope);
     next();
@@ -109,7 +109,7 @@ CoolProgrammer = extend(Programmer, {
 ```
 Note that in the previous sample there is a `serialize` method that has `jsonStringify` decorator (placed at the end of the declaration, so it will be executed AFTER method execution)...
 
-> NOTE! decorators could be placed at the beginning or at the end. This is optional because you always can use hooks in decorator declaration. A method can be decorated multiple times and decorators can support multiple hooks within. Anyway you can place decorators at some possition to be more dynamic when declare new classes.
+> NOTE! Advices could be placed at the beginning or at the end. This is optional because you always can use hooks in decorator declaration. A method can be decorated multiple times and Advices can support multiple hooks within. Anyway you can place Advices at some possition to be more dynamic when declare new classes.
 So the following code does this:
 
 ```javascript
@@ -119,14 +119,14 @@ coolp.serialize() //outputs a string with the serialized instance..
 
 ### YOLO
 
-As you may wonder Decorators support **chained** asynchronous calls because they are callback driven.
+As you may wonder Advices support **chained** asynchronous calls because they are callback driven.
 
-Multiple Decorators for the same method are allowed. You might use hooks inside decorator declaration to control when the decorator will be executed, you can also define multiple hooks in the same decorator:
+Multiple Advices for the same method are allowed. You might use hooks inside decorator declaration to control when the decorator will be executed, you can also define multiple hooks in the same decorator:
 
-> NOTE! to use custom objects/services (user defined variables) inside Decorators you must define it as properties of Decorators::locals. IE: var myCoolService = {cool: 'stuff'}; and then you try to use that inside an decorator it will give an reference error unless you do Decorators.locals.myCoolService = myCoolService.  
+> NOTE! to use custom objects/services (user defined variables) inside Advices you must define it as properties of Advices::locals. IE: var myCoolService = {cool: 'stuff'}; and then you try to use that inside an decorator it will give an reference error unless you do Advices.locals.myCoolService = myCoolService.  
 
 ```javascript
-Decorators.add(function save(index){
+Advices.add(function save(index){
   // hooks
   // this.before(function(opts, next){
   // this.after(function(opts, next){

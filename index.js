@@ -1,25 +1,21 @@
 var Class = require("./src/Class");
-var Decorators = require("./src/Decorators");
-var Phase = require("./src/Phase");
+var Advices = require("./src/Advices");
 
 if (typeof module === "object") {
     module.exports = {
         Class: Class,
-        Decorators: Decorators,
-        Phase: Phase
+        Advices: Advices
     };
 } else {
     window.Class = Class;
-    window.Decorators = Decorators;
-    window.Phase = Phase;
+    window.Advices = Advices;
 }
 
 /**
- * built in decorators
+ * built in Advices
  */
 
-Decorators.push(
-    Phase.EXECUTE,
+Advices.add(
     function override() {
         meta.args.unshift(meta.parentScope[meta.methodName].bind(this));
     }
