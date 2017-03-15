@@ -6,8 +6,9 @@
   "scripts": {
     "test": "mocha",
     "version": "browserify ./index.js -o ./dist/kaop-lib.dev.js ; uglifyjs ./dist/kaop-lib.dev.js --compress --mangle --keep-fnames --output ./dist/kaop-lib.min.js",
-    "preversion": "npm test && coverage.s",
-    "postversion": "git push --follow-tags"
+    "preversion": "npm test",
+    "postversion": "git push --follow-tags",
+    "report-cover": "./coverage.s"
   },
   "keywords": [
     "framework",
