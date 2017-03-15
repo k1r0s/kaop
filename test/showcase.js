@@ -174,8 +174,6 @@ describe("KAOP SHOWCASE", function() {
 
     it("should perform a request when attribute change", function(done) {
 
-        throw new Error("asdasd");
-
         this.slow(500);
 
         exampleModelInstance.on("set", done);
