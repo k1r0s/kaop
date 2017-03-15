@@ -64,7 +64,7 @@ Now we're going to extend `Person` to another subClass called `Programmer`:
 Programmer = Class.inherits(Person, {
   //Advices override inject the SuperClass.constructor as the first parameter
   constructor: ["override", function(parent, name, dborn, favouriteLanguage){
-    parent(name, dborn) //calling it we can save a lot of code
+    parent(name, dborn) //like 'super()' does
     this.favLang = favouriteLanguage
   }],
   run: ["override", function(parent){ //we simply override it to change the behavior
