@@ -1,15 +1,18 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var Class = require("./src/Class");
 var Advices = require("./src/Advices");
+var UseExternal = require("./src/UseExternal");
 
 if (typeof module === "object") {
     module.exports = {
         Class: Class,
-        Advices: Advices
+        Advices: Advices,
+        use: UseExternal
     };
 } else {
     window.Class = Class;
     window.Advices = Advices;
+    window.use = UseExternal;
 }
 
 /**
@@ -22,7 +25,7 @@ Advices.add(
     }
 );
 
-},{"./src/Advices":2,"./src/Class":3}],2:[function(require,module,exports){
+},{"./src/Advices":2,"./src/Class":3,"./src/UseExternal":5}],2:[function(require,module,exports){
 var Iteration = require("./Iteration");
 var Utils = require("./Utils");
 
@@ -61,7 +64,7 @@ module.exports = Advices = {
     }
 };
 
-},{"./Iteration":4,"./Utils":5}],3:[function(require,module,exports){
+},{"./Iteration":4,"./Utils":6}],3:[function(require,module,exports){
 var Advices = require("./Advices");
 
 var Class = function(sourceClass, extendedProperties, static) {
@@ -135,7 +138,20 @@ module.exports = Iteration = function(definitionArray, props, pool, locals) {
     this.step();
 };
 
-},{"./Utils":5}],5:[function(require,module,exports){
+},{"./Utils":6}],5:[function(require,module,exports){
+var Advices = require("./Advices");
+
+module.exports = UseExternal = function(module){
+    function checkDependency(dep){
+        if(!Advices.locals[dep]) throw new Error("unmet dependency: " + dep);
+    }
+
+    module.dependencies.forEach(checkDependency);
+
+    module.advices.forEach(Advices.add, Advices);
+};
+
+},{"./Advices":2}],6:[function(require,module,exports){
 module.exports = Utils = {
     transpileMethod: function(method, meta, next, locals) {
         var methodToString = method.toString();
