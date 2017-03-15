@@ -35,7 +35,7 @@ Advices.add(
         var EXAMPLE_REQUEST = "somehost:8080/api" + this.url();
         var REQUEST_PAYLOAD = meta.result;
 
-        console.log(METHOD, EXAMPLE_REQUEST, REQUEST_PAYLOAD);
+        // console.log(METHOD, EXAMPLE_REQUEST, REQUEST_PAYLOAD);
 
         setTimeout(next, 500);
     });
@@ -173,6 +173,8 @@ describe("KAOP SHOWCASE", function() {
     });
 
     it("should perform a request when attribute change", function(done) {
+
+        throw new Error("asdasd");
 
         this.slow(500);
 

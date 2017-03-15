@@ -55,7 +55,7 @@ describe("Utils::transpileMethod", function() {
     });
     it("second parameter is the `meta` key word, should be available in the method scope", function(done) {
         Utils.transpileMethod(function() {
-            console.log(meta);
+            // console.log(meta);
         }, {
             a: 2,
             v: "patata"
