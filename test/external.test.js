@@ -1,9 +1,7 @@
 var main = require("../index");
 var assert = require("assert");
 
-main.Advices.locals = {
-    $$dep1: { sayHello: function(){} }
-};
+main.Advices.locals["$$dep1"] = { sayHello: function(){} };
 
 // var testmodule = require("myAopModule")
 var testmodule = {
@@ -27,9 +25,7 @@ describe("allow third part advices", function(){
     });
 
     it("should load third part module", function(done){
-        main.Advices.locals = {
-            $$dep1: { sayHello: done }
-        };
+        main.Advices.locals["$$dep1"] = { sayHello: done };
 
         main.use(testmodule);
 
