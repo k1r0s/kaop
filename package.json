@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha",
     "dist": "browserify ./index.js -o ./dist/kaop-lib.dev.js ; uglifyjs ./dist/kaop-lib.dev.js --compress --mangle --keep-fnames --output ./dist/kaop-lib.min.js ; git commit -am \"prerelease - update dist\"",
-    "prepublish": "npm run dist"
+    "preversion": "npm run dist"
   },
   "keywords": [
     "framework",
