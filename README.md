@@ -1,6 +1,7 @@
 # kaop
 
 ![Image travis](https://travis-ci.org/k1r0s/kaop.svg?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/k1r0s/kaop/badge.svg?branch=master)](https://coveralls.io/github/k1r0s/kaop?branch=master)
 
 Kaop is a light package to provide OOP/AOP patterns, also provide an alternative to use the lowest JS version (in browsers world) with top features:
 ---
