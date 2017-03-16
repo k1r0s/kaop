@@ -1,4 +1,4 @@
-var main = require("../index");
+var main = require("../lib/index");
 var assert = require("assert");
 
 main.Advices.locals["$$dep1"] = { sayHello: function(){} };

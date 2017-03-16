@@ -1,5 +1,5 @@
 var assert = require("assert");
-var Utils = require("../src/Utils");
+var Utils = require("../lib/src/Utils");
 
 var pool = [function override(){}];
 
