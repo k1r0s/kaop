@@ -1,5 +1,4 @@
 var http = require("http");
-var emitter = new class Emitter extends require("events") {};
 var assert = require("assert");
 var main = require("../index");
 var Class = main.Class;
