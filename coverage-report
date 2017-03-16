@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+rm -rf coverage
+rm -rf lib-cov
+
+mkdir coverage
+
+node_modules/.bin/jscover src lib-cov
+mv src lib-orig
+mv lib-cov src
+node_modules/.bin/mocha -R mocha-lcov-reporter > coverage/coverage.lcov
+rm -rf src
+mv lib-orig src
