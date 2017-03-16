@@ -168,13 +168,11 @@ var ExampleModel = Class({
 describe("KAOP SHOWCASE", function() {
     var exampleModelInstance;
 
-    before(function() {
+    beforeAll(function() {
         exampleModelInstance = new ExampleModel();
     });
 
     it("should perform a request when attribute change", function(done) {
-
-        this.slow(500);
 
         exampleModelInstance.on("set", done);
 

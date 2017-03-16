@@ -93,7 +93,7 @@ CoolProgrammer = Class.inherits(Programmer, {
 });
 
 describe("functional testing 1", function() {
-    before(function() {
+    beforeAll(function() {
         normalPerson = new Person("Tom", new Date(1978, 4, 11));
     });
 
@@ -106,7 +106,7 @@ describe("functional testing 1", function() {
 
 describe("functional testing 2", function() {
 
-    before(function() {
+    beforeAll(function() {
         normalPerson = new Person("Joe", new Date(1990, 2, 21));
         normalProgrammer = new Programmer("Mike", new Date(1982, 7, 18), "Java");
         coolProgrammer = new CoolProgrammer("Ivan", new Date(1990, 8, 22), "Javascript");
@@ -177,7 +177,6 @@ describe("create a new annotation that parses the first parameter that method re
         assert.strictEqual('{"some":1,"data":{"a":"test"},"asd":[{"y":6},{"y":"asdasd"},{"y":5}]}', DataParser.serialize(o));
     });
     it("Advices can run asynchronous", function(done) {
-        this.slow(1000);
         DataParser = Class.static({
             ping: ["xhrGet: 'google.es'", function(response) {
                 done();
@@ -190,7 +189,7 @@ describe("create a new annotation that parses the first parameter that method re
 
 describe("extending JS native types", function() {
     var List, listInstance;
-    before(function() {
+    beforeAll(function() {
         List = Class.inherits(Array, {
             has: function(val) {
                 return this.indexOf(val) > -1;
@@ -216,7 +215,7 @@ describe("extending JS native types", function() {
 
 describe("Advices could be placed anywhere in the array definition", function() {
     var Service;
-    before(function() {
+    beforeAll(function() {
         Service = Class.static({
             operation1: ["log", function() {
                 Advices.locals.aux.push("operation1");
@@ -238,7 +237,6 @@ describe("Advices could be placed anywhere in the array definition", function() 
 
 describe("multiple async operations", function() {
     it("should get google response and then asign to a new variable", function(done) {
-        this.slow(1000);
         var MyService = Class.static({
             asyncOperation: ["xhrGet: 'google.es'", "processResponse", function(response) {
                 if (response === "something") {
