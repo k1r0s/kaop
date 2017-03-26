@@ -105,7 +105,7 @@ describe("functional testing 1", function() {
 });
 
 describe("functional testing 2", function() {
-
+    /* istanbul ignore next */
     beforeAll(function() {
         normalPerson = new Person("Joe", new Date(1990, 2, 21));
         normalProgrammer = new Programmer("Mike", new Date(1982, 7, 18), "Java");
