@@ -9,7 +9,7 @@
   "scripts": {
     "test": "jest",
     "coverage": "jest --coverage",
-    "version": "browserify ./index.js -o ./dist/kaop-lib.dev.js ; uglifyjs ./dist/kaop-lib.dev.js --compress --mangle --keep-fnames --output ./dist/kaop-lib.min.js",
+    "version": "browserify ./lib/index.js -o ./dist/kaop-lib.dev.js ; uglifyjs ./dist/kaop-lib.dev.js --compress --mangle --keep-fnames --output ./dist/kaop-lib.min.js",
     "preversion": "jest --coverage && cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "postversion": "git push --follow-tags",
     "report-cover": "./coverage.s"

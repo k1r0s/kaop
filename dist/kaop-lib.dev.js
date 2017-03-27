@@ -19,6 +19,7 @@ if (typeof module === "object") {
  * built in Advices
  */
 
+ /* istanbul ignore next */
 Advices.add(
     function override() {
         meta.args.unshift(meta.parentScope[meta.methodName].bind(this));
@@ -67,7 +68,7 @@ module.exports = Advices = {
 },{"./Iteration":4,"./Utils":6}],3:[function(require,module,exports){
 var Advices = require("./Advices");
 
-var Class = function(sourceClass, extendedProperties, static) {
+var Class = function(sourceClass, extendedProperties, _static) {
 
     var inheritedProperties = Object.create(sourceClass.prototype);
 
@@ -79,7 +80,7 @@ var Class = function(sourceClass, extendedProperties, static) {
         });
     }
 
-    if (!static) {
+    if (!_static) {
         var extendedClass = function() {
             try {
                 if (typeof this.constructor === "function") this.constructor.apply(this, arguments);
@@ -165,9 +166,11 @@ module.exports = Utils = {
         }
 
         var transpiledFunction = "(function(" + functionArguments + ")\n{ " + functionBody + " \n})";
-        with(locals) {
-            return eval(transpiledFunction);
+        var names = Object.keys(locals);
+        for (var i = 0; i < names.length; i++) {
+            eval("var " + names[i] + " = locals[names[i]]");
         }
+        return eval(transpiledFunction);
     },
     getAdviceImp: function(rawAdviceCall) {
         return {
