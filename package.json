@@ -12,7 +12,8 @@
     "version": "browserify ./lib/index.js -o ./dist/kaop-lib.dev.js ; uglifyjs ./dist/kaop-lib.dev.js --compress --mangle --keep-fnames --output ./dist/kaop-lib.min.js",
     "preversion": "jest --coverage && cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "postversion": "git push --follow-tags",
-    "report-cover": "./coverage.s"
+    "report-cover": "./coverage.s",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "keywords": [
     "framework",
@@ -23,7 +24,7 @@
   "author": "k1r0s",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/k1r0s/kaop.git"
+    "url": "https://github.com/k1r0s/kaop.git"
   },
   "homepage": "https://github.com/k1r0s/kaop",
   "bugs": {
@@ -34,6 +35,7 @@
     "browserify": "^14.1.0",
     "coveralls": "^2.12.0",
     "jest": "^19.0.2",
-    "uglifyjs": "^2.4.10"
+    "uglifyjs": "^2.4.10",
+    "semantic-release": "^6.3.2"
   }
 }
