@@ -1,5 +1,5 @@
 var assert = require("assert");
-var Advices = require("../lib/index").Advices;
+var Advices = require("../Advices");
 
 Advices.add(
     function prop1() {},

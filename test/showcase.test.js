@@ -7,9 +7,8 @@
  */
 
 var assert = require("assert");
-var main = require("../lib/index");
-var Class = main.Class;
-var Advices = main.Advices;
+var Class = require("../Class");
+var Advices = require("../Advices");
 
 Advices.locals.myCoolService = $$myCoolService = 1;
 
