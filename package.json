@@ -1,6 +1,6 @@
 {
   "name": "kaop",
-  "version": "2.7.9",
+  "version": "2.7.10",
   "description": "simple js OOP/AOP lib helper with classes, inheritance and method Advices (method interceptors)",
   "main": "root.js",
   "jest": {
