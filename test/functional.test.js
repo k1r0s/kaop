@@ -54,6 +54,7 @@ Advices.add(
 );
 
 Person = Class({
+    nicks: [],
     constructor: function(name, dborn) {
         this.name = name;
         this.dborn = dborn;
@@ -66,6 +67,9 @@ Person = Class({
             .getFullYear();
         var yearBorn = this.dborn.getFullYear();
         return currentYear - yearBorn;
+    },
+    addNick: function(nick){
+        this.nicks.push(nick);
     }
 });
 
@@ -147,6 +151,15 @@ describe("functional testing 2", function() {
         assert.equal("Im running!", normalPerson.run());
         assert.equal("Im running! but... not as faster, coz im fat :/", normalProgrammer.run());
         assert.equal("IM FAST AS HELL!! GET OUT OF MY WAY!", coolProgrammer.run());
+    });
+
+    it("instances should have 'default' properties", function() {
+        normalPerson.addNick("someone");
+        normalProgrammer.addNick("Miqt");
+        normalProgrammer.addNick("Maik");
+
+        assert.strictEqual('["someone"]', JSON.stringify(normalPerson.nicks));
+        assert.strictEqual('["Miqt","Maik"]', JSON.stringify(normalProgrammer.nicks));
     });
 });
 
