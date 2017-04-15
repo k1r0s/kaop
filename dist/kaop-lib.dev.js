@@ -86,9 +86,11 @@ var Class = function(sourceClass, extendedProperties, _static) {
                 for (var propertyName in this) {
                     if (Utils.isFunction(this[propertyName])) {
                         this[propertyName] = this[propertyName].bind(this);
-                    } else {
+                    } else if (extendedProperties.hasOwnProperty(propertyName)) {
                         // FIXME https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
-                        this[propertyName] = eval(JSON.stringify(inheritedProperties[propertyName]));
+                        // clone js objects, avoid reference point
+                        var tmp = JSON.parse(JSON.stringify(extendedProperties[propertyName]));
+                        this[propertyName] = tmp;
                     }
                 }
             } finally {
