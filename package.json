@@ -1,6 +1,6 @@
 {
   "name": "kaop",
-  "version": "2.7.10",
+  "version": "3.0.0",
   "description": "simple js OOP lib helper with IoC extensions",
   "main": "type.js",
   "scripts": {
