@@ -1,25 +1,16 @@
 {
   "name": "kaop",
   "version": "2.7.10",
-  "description": "simple js OOP/AOP lib helper with classes, inheritance and method Advices (method interceptors)",
-  "main": "root.js",
-  "jest": {
-    "verbose": true
-  },
+  "description": "simple js OOP lib helper with IoC extensions",
+  "main": "type.js",
   "scripts": {
-    "test": "jest",
-    "coverage": "jest --coverage",
-    "version": "browserify ./lib/index.js -o ./dist/kaop-lib.dev.js ; uglifyjs ./dist/kaop-lib.dev.js --compress --mangle --keep-fnames --output ./dist/kaop-lib.min.js",
-    "preversion": "jest --coverage && cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js ; git commit --amend",
-    "postversion": "git push origin master --follow-tags",
-    "report-cover": "./coverage.s",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+    "test": "jest"
   },
   "keywords": [
-    "framework",
-    "helper",
     "oop",
-    "aop"
+    "aop",
+    "ioc",
+    "di"
   ],
   "author": "k1r0s",
   "repository": {
@@ -30,12 +21,5 @@
   "bugs": {
     "url": "https://github.com/k1r0s/kaop/issues"
   },
-  "license": "ISC",
-  "devDependencies": {
-    "browserify": "^14.1.0",
-    "coveralls": "^2.12.0",
-    "jest": "^19.0.2",
-    "uglifyjs": "^2.4.10",
-    "semantic-release": "^6.3.2"
-  }
+  "license": "MIT",
 }
