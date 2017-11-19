@@ -88,21 +88,29 @@ function createInstance(_type) {
   return object;
 }
 
-var factory = function(_type){
+function index(props) {
+  return def(function() {}, props)
+}
+
+function inherits(parent, props) {
+  return def(parent, props)
+}
+
+function factory(_type){
   return function () {
     return new _type;
   }
-};
+}
 
-var singleton = function (_type) {
+function singleton(_type) {
   var instance;
   return function () {
     if (!instance) instance = new _type;
     return instance;
   }
-};
+}
 
-var clear = function(type){
+function clear(type){
   for (var key in type.signature) {
     if(type.signature[key] instanceof Array && isValidArraySignature(type.signature[key])) {
       type.prototype[key] = getProxyMethodBody(type.signature[key]);
@@ -112,8 +120,8 @@ var clear = function(type){
 }
 
 // oop
-module.exports = function(props) { return def(function() {}, props) };
-module.exports.inherits = function(parent, props) { return def(parent, props) };
+module.exports = index;
+module.exports.inherits = inherits;
 
 // advices
 module.exports.advice = advice;
