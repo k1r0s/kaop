@@ -12,6 +12,7 @@ function def(sourceClass, extendedProperties, opts) {
 
 function wove(target, props){
   var woved = Object.assign({}, props);
+
   for (var key in woved) {
     if(woved[key] instanceof Array && isValidArraySignature(woved[key])) {
       woved[key] = createProxyFn(target, key, woved[key]);
@@ -27,7 +28,7 @@ function createProxyFn(target, key, adviceList) {
     function commitNext() {
       adviceIndex++;
       if (adviceList[adviceIndex]) {
-        if (adviceList[adviceIndex].name === "advice") {
+        if (!isMethod(adviceList[adviceIndex])) {
           adviceList[adviceIndex](adviceMetadata);
           if (!isAsync(adviceList[adviceIndex])) adviceMetadata.commit();
         } else {
@@ -53,13 +54,17 @@ function createProxyFn(target, key, adviceList) {
   }
 }
 
+function isMethod(fn) {
+  return !fn.advice
+}
+
 function isValidArraySignature(ff) {
   return ff.every(function(fn) { return typeof fn === "function" }) &&
-  ff.filter(function(fn) { return !fn.name }).length === 1;
+  ff.filter(isMethod).length === 1;
 }
 
 function getProxyMethodBody(adviceList) {
-  return adviceList.find(function(fn) { return !fn.name });
+  return adviceList.find(isMethod);
 }
 
 function isAsync(rawAdvice) {
@@ -67,7 +72,7 @@ function isAsync(rawAdvice) {
 }
 
 function advice(fn){
-  fn.name = "advice";
+  fn.advice = 1;
   return fn;
 }
 
@@ -77,9 +82,18 @@ var override = advice(function(meta) {
 
 var inject = function(){
   var providers = Array.prototype.slice.call(arguments);
-  return advice(function (meta) {
+  return advice(function(meta) {
     if (meta.key !== "constructor") { throw new Error("inject only available in constructor") }
     meta.args = providers.map(function(provider) { return provider() });
+  });
+}
+
+var assign = function(dependencies) {
+  return advice(function(meta){
+    for (var propName in dependencies) {
+      var provider = dependencies[propName];
+      meta.scope[propName] = provider();
+    }
   });
 }
 
@@ -127,6 +141,7 @@ module.exports.inherits = inherits;
 module.exports.advice = advice;
 module.exports.override = override;
 module.exports.inject = inject;
+module.exports.assign = assign;
 
 // di
 module.exports.factory = factory;
