@@ -43,7 +43,7 @@ describe("check basic features", () => {
     expect(l).toBeInstanceOf(Array);
     l.push(4, 5, 6);
     expect(l).toBeInstanceOf(List);
-    expect(l.has).toBeDefined();
+    expect(typeof l.has).toEqual("function");
     expect(l.has(5)).toBeTruthy();
   });
 });

@@ -10,9 +10,8 @@ function wove(target, props){
 }
 
 function createProxyFn(target, key, adviceList) {
-  var adviceIndex = -1;
   return function() {
-
+    var adviceIndex = -1;
     function commitNext() {
       adviceIndex++;
       if (adviceList[adviceIndex]) {

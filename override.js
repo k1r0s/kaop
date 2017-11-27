@@ -1,7 +1,10 @@
 var advice = require("./advice");
 
-var override = advice(function(meta) {
-  meta.args.unshift(meta.target.super.prototype[meta.key].bind(meta.scope));
-});
-
-module.exports = override;
+module.exports = {
+  apply: advice(function(meta) {
+    meta.target.super.prototype[meta.key].apply(meta.scope, meta.args);
+  }),
+  get: advice(function(meta) {
+    meta.args.unshift(meta.target.super.prototype[meta.key].bind(meta.scope));
+  })
+}

@@ -1,23 +1,27 @@
 var type = require('../');
-var advice = require('../advice');
+var override = require('../override');
 
-var Person = type({
-  name: undefined,
-  constructor: function(name){
-    this.name = name;
-  },
-  sayHello: function() {
-    return "Hey, I'm " + this.name;
-  }
-})
-
-describe("check basic features", () => {
-  it("basic oop features", () => {
-    var p = new Person("Ivan Kalash");
-    expect(p).toBeInstanceOf(Person);
-  });
-  it("basic scoped methods", () => {
-    var p = new Person("Ivan Kalash");
-    expect(p.sayHello()).toEqual("Hey, I'm Ivan Kalash");
-  });
+var CustomList = type.inherits(Array, {
+  push: [override.apply, function(){
+  }],
+  pop: [override.apply, function(){
+  }],
 });
+
+var list1, list2;
+
+describe("advice specs", () => {
+  beforeEach(() => {
+    list1 =  new Array;
+    list2 =  new CustomList;
+  });
+
+  it("should be able to call custom actions without messing proto behavior", () => {
+    list2.push(3, 4);
+    list1.push(3, 4);
+    expect(list1[1]).toEqual(list2[1]);
+    list2.pop();
+    list1.pop();
+    expect(list1[1]).toEqual(list2[1]);
+  });
+})
