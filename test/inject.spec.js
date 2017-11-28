@@ -19,18 +19,18 @@ var EventEmitter, EventEmitterProvider = provide.factory(EventEmitter = type({
 }));
 
 var ObservableArray = type.inherits(Array, {
-  $obs: null,
-  constructor: [inject.param(EventEmitterProvider), function(obs) {
-    this.$obs = obs;
+  $evt: null,
+  constructor: [inject.param(EventEmitterProvider), function(evtInstance) {
+    this.$evt = evtInstance;
   }],
   onChange: function(cbk) {
-    this.$obs.when("update", cbk.bind(this));
+    this.$evt.when("update", cbk.bind(this));
   },
   push: [override.apply, function() {
-    this.$obs.force("update");
+    this.$evt.force("update");
   }],
   pop: [override.apply, function() {
-    this.$obs.force("update");
+    this.$evt.force("update");
   }]
 });
 
@@ -42,7 +42,7 @@ describe("inject specs", () => {
   });
 
   it("should be able to inject dependencies", () => {
-    expect(list.$obs).toBeInstanceOf(EventEmitter);
+    expect(list.$evt).toBeInstanceOf(EventEmitter);
   });
 
   it("injected instance should have full capabilities", done => {
