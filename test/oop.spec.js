@@ -1,6 +1,6 @@
-var createClass = require('../');
+var base = require('../');
 
-var Person = createClass({
+var Person = base.createClass({
   name: undefined,
   constructor: function(name){
     this.name = name;
@@ -10,13 +10,13 @@ var Person = createClass({
   }
 });
 
-var Programmer = createClass.inherits(Person, {
+var Programmer = base.inherits(Person, {
   code: function() {
     return this.sayHello() + " and I code";
   }
 });
 
-var List = createClass.inherits(Array, {
+var List = base.inherits(Array, {
   has: function(val) {
     return this.indexOf(val) > -1;
   }

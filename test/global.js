@@ -1,4 +1,4 @@
-var createClass = require('../');
+var base = require('../');
 var reflect = require('../reflect');
 
 var Log = reflect.advice(function(meta){
@@ -22,7 +22,7 @@ var SomersaultAspect = reflect.aspect((currentProps, key) => {
   return currentProps;
 })
 
-var Person = createClass(LoggerAspect(SomersaultAspect({
+var Person = base.createClass(LoggerAspect(SomersaultAspect({
   name: undefined,
   constructor: function(name){
     this.name = name;

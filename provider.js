@@ -1,14 +1,18 @@
-module.exports = {
-  factory: function(_type){
-    return function () {
-      return new _type;
-    }
-  },
-  singleton: function(_type) {
-    var instance;
-    return function () {
-      if (!instance) instance = new _type;
-      return instance;
-    }
+function factory(targetClass){
+  return function () {
+    return new targetClass;
   }
+}
+
+function singleton(targetClass) {
+  var instance;
+  return function () {
+    if (!instance) instance = new targetClass;
+    return instance;
+  }
+}
+
+module.exports = {
+  factory: factory,
+  singleton: singleton
 };

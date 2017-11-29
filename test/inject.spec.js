@@ -1,9 +1,9 @@
-var createClass = require('../');
+var base = require('../');
 var inject = require('../inject');
 var provide = require('../provider');
 var override = require('../override');
 
-var EventEmitter, EventEmitterProvider = provide.factory(EventEmitter = createClass({
+var EventEmitter, EventEmitterProvider = provide.factory(EventEmitter = base.createClass({
   actions: [],
   when: function(uid, handler) {
     this.actions.push({ uid, handler });
@@ -18,7 +18,7 @@ var EventEmitter, EventEmitterProvider = provide.factory(EventEmitter = createCl
   }
 }));
 
-var SomeService, SomeServiceProvider = provide.singleton(SomeService = createClass({
+var SomeService, SomeServiceProvider = provide.singleton(SomeService = base.createClass({
   store: null,
   constructor: function() {
     this.store = {};
@@ -33,7 +33,7 @@ var SomeService, SomeServiceProvider = provide.singleton(SomeService = createCla
 
 var AnotherServiceProvider = provide.factory(SomeService);
 
-var ObservableArray = createClass.inherits(Array, {
+var ObservableArray = base.inherits(Array, {
   constructor: [
     inject.args(
       EventEmitterProvider,
@@ -54,7 +54,7 @@ var ObservableArray = createClass.inherits(Array, {
   }]
 });
 
-var DummyModel = createClass({
+var DummyModel = base.createClass({
   constructor: [
     inject.assign({
       $evt: EventEmitterProvider,

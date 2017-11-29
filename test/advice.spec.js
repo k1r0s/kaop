@@ -1,4 +1,4 @@
-var createClass = require('../');
+var base = require('../');
 var reflect = require('../reflect');
 
 var methodSpy = jest.fn()
@@ -20,7 +20,7 @@ var Cache = (function() {
   }
 })();
 
-var Person = createClass({
+var Person = base.createClass({
   constructor(name, yearBorn) {
     this.name = name;
     this.age = new Date(yearBorn, 1, 1);

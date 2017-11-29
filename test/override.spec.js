@@ -1,7 +1,7 @@
-var createClass = require('../');
+var base = require('../');
 var override = require('../override');
 
-var CustomList = createClass.inherits(Array, {
+var CustomList = base.inherits(Array, {
   total: 0,
   push: [override.apply, function() {
     this.sum();
