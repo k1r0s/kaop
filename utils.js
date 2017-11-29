@@ -16,7 +16,7 @@ function createProxyFn(target, key, adviceList) {
       adviceIndex++;
       if (adviceList[adviceIndex]) {
         if (!isMethod(adviceList[adviceIndex])) {
-          adviceList[adviceIndex](adviceMetadata);
+          adviceList[adviceIndex].call(undefined, adviceMetadata);
           if (!isAsync(adviceList[adviceIndex])) adviceMetadata.commit();
         } else {
           adviceMetadata.result = adviceList[adviceIndex].apply(adviceMetadata.scope, adviceMetadata.args);
@@ -32,7 +32,8 @@ function createProxyFn(target, key, adviceList) {
       method: getMethodFromArraySignature(adviceList),
       target: target,
       result: undefined,
-      commit: commitNext
+      commit: commitNext,
+      break: function() { this.commit = function() {} }
     };
 
     commitNext();
