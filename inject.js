@@ -1,7 +1,7 @@
 var advice = require("./advice");
 
 module.exports = {
-  param: function(){
+  args: function(){
     var providers = Array.prototype.slice.call(arguments);
     return advice(function(meta) {
       if (meta.key !== "constructor") { throw new Error("inject only available in constructor") }
