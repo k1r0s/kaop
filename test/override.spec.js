@@ -1,7 +1,7 @@
-var type = require('../');
+var createClass = require('../');
 var override = require('../override');
 
-var CustomList = type.inherits(Array, {
+var CustomList = createClass.inherits(Array, {
   total: 0,
   push: [override.apply, function() {
     this.sum();
@@ -39,7 +39,7 @@ describe("advice specs", () => {
     expect(list1[1]).toEqual(list2[1]);
   });
 
-  it("extended type should be able keep original behavior featuring new things", () => {
+  it("extended createClass should be able keep original behavior featuring new things", () => {
     list2.push(3, 4);
     list2.unshift(9);
     list2.push(5, 4, 7, 7);

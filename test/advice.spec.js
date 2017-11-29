@@ -1,12 +1,12 @@
-var type = require('../');
-var advice = require('../advice');
+var createClass = require('../');
+var reflect = require('../reflect');
 
 var methodSpy = jest.fn()
 
 var Cache = (function() {
   var CACHE_KEY = "#CACHE";
   return {
-    read: advice(function(meta){
+    read: reflect.advice(function(meta){
       if(!meta.scope[CACHE_KEY]) meta.scope[CACHE_KEY] = {};
 
       if(meta.scope[CACHE_KEY][meta.key]) {
@@ -14,13 +14,13 @@ var Cache = (function() {
         meta.break();
       }
     }),
-    write: advice(function(meta){
+    write: reflect.advice(function(meta){
       meta.scope[CACHE_KEY][meta.key] = meta.result;
     })
   }
 })();
 
-var Person = type({
+var Person = createClass({
   constructor(name, yearBorn) {
     this.name = name;
     this.age = new Date(yearBorn, 1, 1);
@@ -40,7 +40,7 @@ var Person = type({
 
 var personInstance;
 
-describe("advance advice specs", () => {
+describe("advance reflect.advice specs", () => {
   beforeEach(() => {
     personInstance = new Person("Manuelo", 1998);
   })

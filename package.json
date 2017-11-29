@@ -14,7 +14,7 @@
   ],
   "author": "k1r0s",
   "repository": {
-    "type": "git",
+    "createClass": "git",
     "url": "https://github.com/k1r0s/kaop.git"
   },
   "homepage": "https://github.com/k1r0s/kaop",

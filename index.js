@@ -20,13 +20,13 @@ function inherits(parent, props) {
   return def(parent, props)
 }
 
-function clear(type){
-  for (var key in type.signature) {
-    if(type.signature[key] instanceof Array && utils.isValidArraySignature(type.signature[key])) {
-      type.prototype[key] = utils.getMethodFromArraySignature(type.signature[key]);
+function clear(createClass){
+  for (var key in createClass.signature) {
+    if(createClass.signature[key] instanceof Array && utils.isValidArraySignature(createClass.signature[key])) {
+      createClass.prototype[key] = utils.getMethodFromArraySignature(createClass.signature[key]);
     }
   }
-  return type;
+  return createClass;
 }
 
 // oop

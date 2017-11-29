@@ -1,10 +1,10 @@
-var advice = require("./advice");
+var reflect = require("./reflect");
 
 module.exports = {
-  apply: advice(function(meta) {
+  apply: reflect.advice(function(meta) {
     meta.target.super.prototype[meta.key].apply(meta.scope, meta.args);
   }),
-  implement: advice(function(meta) {
+  implement: reflect.advice(function(meta) {
     meta.args.unshift(meta.target.super.prototype[meta.key].bind(meta.scope));
   })
 }
