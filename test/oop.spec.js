@@ -1,6 +1,6 @@
-const base = require('../');
+const { createClass, extend } = require('../');
 
-const Person = base.createClass({
+const Person = createClass({
   name: undefined,
   constructor: function(name){
     this.name = name;
@@ -10,13 +10,13 @@ const Person = base.createClass({
   }
 });
 
-const Programmer = base.extend(Person, {
+const Programmer = extend(Person, {
   code: function() {
     return this.sayHello() + " and I code";
   }
 });
 
-const List = base.extend(Array, {
+const List = extend(Array, {
   has: function(val) {
     return this.indexOf(val) > -1;
   }

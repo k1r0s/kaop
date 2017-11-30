@@ -1,9 +1,6 @@
-const base = require('../');
-const inject = require('../inject');
-const provide = require('../provider');
-const override = require('../override');
+const { createClass, extend, inject, override, provider } = require('../');
 
-const EventEmitter = base.createClass({
+const EventEmitter = createClass({
   actions: [],
   when: function(uid, handler) {
     this.actions.push({ uid, handler });
@@ -18,9 +15,9 @@ const EventEmitter = base.createClass({
   }
 });
 
-const EventEmitterProvider = provide.factory(EventEmitter);
+const EventEmitterProvider = provider.factory(EventEmitter);
 
-const SomeService = base.createClass({
+const SomeService = createClass({
   store: null,
   constructor: function() {
     this.store = {};
@@ -33,10 +30,10 @@ const SomeService = base.createClass({
   }
 });
 
-const SomeServiceProvider = provide.singleton(SomeService);
-const AnotherServiceProvider = provide.factory(SomeService);
+const SomeServiceProvider = provider.singleton(SomeService);
+const AnotherServiceProvider = provider.factory(SomeService);
 
-const ObservableArray = base.extend(Array, {
+const ObservableArray = extend(Array, {
   constructor: [
     inject.args(
       EventEmitterProvider,
@@ -57,7 +54,7 @@ const ObservableArray = base.extend(Array, {
   }]
 });
 
-const DummyModel = base.createClass({
+const DummyModel = createClass({
   constructor: [
     inject.assign({
       $evt: EventEmitterProvider,

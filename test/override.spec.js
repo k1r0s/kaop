@@ -1,7 +1,6 @@
-const base = require('../');
-const override = require('../override');
+const { extend, createClass, override } = require('../');
 
-const CustomList = base.extend(Array, {
+const CustomList = extend(Array, {
   total: 0,
   push: [override.apply, function() {
     this.sum();

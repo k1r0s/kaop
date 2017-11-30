@@ -1,5 +1,4 @@
-const base = require('../');
-const reflect = require('../reflect');
+const { createClass, reflect } = require('../');
 
 const Log = reflect.advice(function(meta){
   console.info(`${meta.key} method called with ${JSON.stringify(meta.args)} returned ${meta.result}`);
@@ -22,7 +21,7 @@ const SomersaultAspect = reflect.aspect((currentProps, key) => {
   return currentProps;
 })
 
-const Person = base.createClass(LoggerAspect(SomersaultAspect({
+const Human = createClass(LoggerAspect(SomersaultAspect({
   name: undefined,
   constructor: function(name){
     this.name = name;
@@ -32,7 +31,7 @@ const Person = base.createClass(LoggerAspect(SomersaultAspect({
   }
 })));
 
-const p = new Person("tali");
+const human = new Human("Samus Aran");
 
-p.sayHello();
-p.doSommersault();
+human.sayHello();
+human.doSommersault();

@@ -1,5 +1,4 @@
-const base = require('../');
-const reflect = require('../reflect');
+const { createClass, reflect } = require('../');
 
 const methodSpy = jest.fn();
 
@@ -22,7 +21,7 @@ const Cache = (function() {
   }
 })();
 
-const Person = base.createClass({
+const Person = createClass({
   constructor(name, yearBorn) {
     this.name = name;
     this.age = new Date(yearBorn, 1, 1);
@@ -38,7 +37,7 @@ const Person = base.createClass({
     return `hello, I'm ${this.name}, and I'm ${this._veryHeavyCalculation()} years old`;
   },
 
-  doSomething: [Delay(1000), function(cbk) {
+  doSomething: [Delay(300), function(cbk) {
     cbk();
   }]
 })
@@ -46,7 +45,7 @@ const Person = base.createClass({
 let personInstance;
 
 describe("advance reflect.advice specs", () => {
-  beforeEach(() => {
+  beforeAll(() => {
     personInstance = new Person("Manuelo", 1998);
   })
 
@@ -58,11 +57,13 @@ describe("advance reflect.advice specs", () => {
 
   })
 
-  it("Delay advice should stop the execution for at least one segond", done => {
+  it("Delay advice should stop the execution for at least one segond", () => {
     const time = Date.now();
-    personInstance.doSomething(() => {
-      expect(Date.now() - time).toBeGreaterThan(1000);
-      done();
+    return new Promise(resolve => {
+      personInstance.doSomething(function() {
+        expect(Date.now() - time).toBeGreaterThan(300);
+        resolve();
+      });
     });
   })
 
