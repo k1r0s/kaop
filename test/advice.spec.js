@@ -1,12 +1,14 @@
 const base = require('../');
 const reflect = require('../reflect');
 
-const methodSpy = jest.fn()
+const methodSpy = jest.fn();
+
+const Delay = secs => reflect.advice(meta => setTimeout(meta.commit, secs));
 
 const Cache = (function() {
   const CACHE_KEY = "#CACHE";
   return {
-    read: reflect.advice(function(meta){
+    read: reflect.advice(meta => {
       if(!meta.scope[CACHE_KEY]) meta.scope[CACHE_KEY] = {};
 
       if(meta.scope[CACHE_KEY][meta.key]) {
@@ -14,7 +16,7 @@ const Cache = (function() {
         meta.break();
       }
     }),
-    write: reflect.advice(function(meta){
+    write: reflect.advice(meta => {
       meta.scope[CACHE_KEY][meta.key] = meta.result;
     })
   }
@@ -34,9 +36,12 @@ const Person = base.createClass({
 
   sayHello(){
     return `hello, I'm ${this.name}, and I'm ${this._veryHeavyCalculation()} years old`;
-  }
-})
+  },
 
+  doSomething: [Delay(1000), function(cbk) {
+    cbk();
+  }]
+})
 
 let personInstance;
 
@@ -51,6 +56,14 @@ describe("advance reflect.advice specs", () => {
     personInstance.sayHello();
     expect(methodSpy).toHaveBeenCalledTimes(1)
 
+  })
+
+  it("Delay advice should stop the execution for at least one segond", done => {
+    const time = Date.now();
+    personInstance.doSomething(() => {
+      expect(Date.now() - time).toBeGreaterThan(1000);
+      done();
+    });
   })
 
 })
