@@ -8,7 +8,7 @@ function def(sourceClass, extendedProperties, opts) {
 
   extendedType.super = sourceClass;
   extendedType.signature = extendedProperties;
-  var wovedProps = reflect.wove(extendedType, extendedProperties);
+  const wovedProps = reflect.wove(extendedType, extendedProperties);
   extendedType.prototype = Object.assign(Object.create(sourceClass.prototype), wovedProps);
   return extendedType;
 }
@@ -17,12 +17,12 @@ function index(props) {
   return def(function() {}, props)
 }
 
-function inherits(parent, props) {
+function extend(parent, props) {
   return def(parent, props)
 }
 
 function clear(targetClass){
-  for (var key in targetClass.signature) {
+  for (const key in targetClass.signature) {
     if(targetClass.signature[key] instanceof Array && utils.isValidArraySignature(targetClass.signature[key])) {
       targetClass.prototype[key] = utils.getMethodFromArraySignature(targetClass.signature[key]);
     }
@@ -33,6 +33,6 @@ function clear(targetClass){
 // oop
 module.exports = {
   createClass: index,
-  inherits: inherits,
+  extend: extend,
   clear: clear
 }

@@ -1,7 +1,7 @@
-var base = require('../');
-var override = require('../override');
+const base = require('../');
+const override = require('../override');
 
-var CustomList = base.inherits(Array, {
+const CustomList = base.extend(Array, {
   total: 0,
   push: [override.apply, function() {
     this.sum();
@@ -22,7 +22,7 @@ var CustomList = base.inherits(Array, {
   }
 });
 
-var list1, list2;
+let list1, list2;
 
 describe("advice specs", () => {
   beforeEach(() => {

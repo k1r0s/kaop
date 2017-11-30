@@ -1,24 +1,26 @@
-var base = require('../');
-var inject = require('../inject');
-var provide = require('../provider');
-var override = require('../override');
+const base = require('../');
+const inject = require('../inject');
+const provide = require('../provider');
+const override = require('../override');
 
-var EventEmitter, EventEmitterProvider = provide.factory(EventEmitter = base.createClass({
+const EventEmitter = base.createClass({
   actions: [],
   when: function(uid, handler) {
     this.actions.push({ uid, handler });
   },
   force: function(uid, data) {
-    var matched = this.actions.find(action => action.uid === uid)
+    const matched = this.actions.find(action => action.uid === uid)
 
     matched && matched.handler.call(undefined, data);
   },
   ignore: function(uid) {
     this.actions = this.actions.filter(action => action.uid !== idEvent);
   }
-}));
+});
 
-var SomeService, SomeServiceProvider = provide.singleton(SomeService = base.createClass({
+const EventEmitterProvider = provide.factory(EventEmitter);
+
+const SomeService = base.createClass({
   store: null,
   constructor: function() {
     this.store = {};
@@ -29,11 +31,12 @@ var SomeService, SomeServiceProvider = provide.singleton(SomeService = base.crea
   set: function(key, val){
     return this.store[key] = val;
   }
-}));
+});
 
-var AnotherServiceProvider = provide.factory(SomeService);
+const SomeServiceProvider = provide.singleton(SomeService);
+const AnotherServiceProvider = provide.factory(SomeService);
 
-var ObservableArray = base.inherits(Array, {
+const ObservableArray = base.extend(Array, {
   constructor: [
     inject.args(
       EventEmitterProvider,
@@ -54,7 +57,7 @@ var ObservableArray = base.inherits(Array, {
   }]
 });
 
-var DummyModel = base.createClass({
+const DummyModel = base.createClass({
   constructor: [
     inject.assign({
       $evt: EventEmitterProvider,
@@ -65,7 +68,7 @@ var DummyModel = base.createClass({
   ]
 });
 
-var list, model;
+let list, model;
 
 describe("inject specs", () => {
   beforeEach(() => {

@@ -1,4 +1,4 @@
-var utils = require("./utils");
+const utils = require("./utils");
 
 function advice(fn){
   fn.advice = 1;
@@ -12,9 +12,9 @@ function aspect(fn){
 };
 
 function wove(target, props){
-  var woved = Object.assign({}, props);
+  const woved = Object.assign({}, props);
 
-  for (var key in woved) {
+  for (let key in woved) {
     if(woved[key] instanceof Array && utils.isValidArraySignature(woved[key])) {
       woved[key] = createProxyFn(target, key, woved[key]);
     }
@@ -24,7 +24,7 @@ function wove(target, props){
 
 function createProxyFn(target, key, adviceList) {
   return function() {
-    var adviceIndex = -1;
+    let adviceIndex = -1;
     function commitNext() {
       adviceIndex++;
       if (adviceList[adviceIndex]) {
@@ -38,7 +38,7 @@ function createProxyFn(target, key, adviceList) {
       }
     }
 
-    var adviceMetadata = {
+    const adviceMetadata = {
       args: Array.prototype.slice.call(arguments),
       scope: this,
       key: key,

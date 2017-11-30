@@ -1,13 +1,15 @@
+const utils = require("./utils");
+
 function factory(targetClass){
   return function () {
-    return new targetClass;
+    return utils.createInstance(targetClass);
   }
 }
 
 function singleton(targetClass) {
-  var instance;
+  let instance;
   return function () {
-    if (!instance) instance = new targetClass;
+    if (!instance) instance = utils.createInstance(targetClass);
     return instance;
   }
 }

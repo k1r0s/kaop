@@ -1,10 +1,10 @@
-var base = require('../');
-var reflect = require('../reflect');
+const base = require('../');
+const reflect = require('../reflect');
 
-var methodSpy = jest.fn()
+const methodSpy = jest.fn()
 
-var Cache = (function() {
-  var CACHE_KEY = "#CACHE";
+const Cache = (function() {
+  const CACHE_KEY = "#CACHE";
   return {
     read: reflect.advice(function(meta){
       if(!meta.scope[CACHE_KEY]) meta.scope[CACHE_KEY] = {};
@@ -20,7 +20,7 @@ var Cache = (function() {
   }
 })();
 
-var Person = base.createClass({
+const Person = base.createClass({
   constructor(name, yearBorn) {
     this.name = name;
     this.age = new Date(yearBorn, 1, 1);
@@ -28,7 +28,7 @@ var Person = base.createClass({
 
   _veryHeavyCalculation: [Cache.read, function() {
       methodSpy();
-      var today = new Date();
+      const today = new Date();
       return today.getFullYear() - this.age.getFullYear();
   }, Cache.write],
 
@@ -38,7 +38,7 @@ var Person = base.createClass({
 })
 
 
-var personInstance;
+let personInstance;
 
 describe("advance reflect.advice specs", () => {
   beforeEach(() => {

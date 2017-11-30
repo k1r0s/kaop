@@ -1,7 +1,7 @@
-var reflect = require("./reflect");
+const reflect = require("./reflect");
 
 function args(){
-  var providers = Array.prototype.slice.call(arguments);
+  const providers = Array.prototype.slice.call(arguments);
   return reflect.advice(function(meta) {
     if (meta.key !== "constructor") { throw new Error("inject only available in constructor") }
     meta.args = providers.map(function(provider) { return provider() });
@@ -10,8 +10,8 @@ function args(){
 
 function assign(dependencies) {
   return reflect.advice(function(meta){
-    for (var propName in dependencies) {
-      var provider = dependencies[propName];
+    for (const propName in dependencies) {
+      const provider = dependencies[propName];
       meta.scope[propName] = provider();
     }
   });

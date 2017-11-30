@@ -12,8 +12,7 @@ function getMethodFromArraySignature(adviceList) {
 }
 
 function createInstance(_type) {
-  var object = new _type;
-  return object;
+  return new _type;
 }
 
 function isAsync(rawAdvice) {
