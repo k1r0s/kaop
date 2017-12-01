@@ -126,7 +126,7 @@ This library tries to provide an alternative to ES6 class constructors which can
 Building Dependency Injection system is trivial. For example:
 
 ```javascript
-import { createClass, inject, provider, inject } from 'kaop'
+import { createClass, inject, provider } from 'kaop'
 
 
 // having the following service
