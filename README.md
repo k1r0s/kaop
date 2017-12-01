@@ -104,7 +104,7 @@ const Memoize = (function() {
 
 Advices are pieces of code that can be plugged in several places within OOP paradigm like 'beforeMethod', 'afterInstance'.. etc. Advices are used to change, extend, modify the behavior of methods and constructors non-invasively.
 
-If you're looking for better experience using advices and vanilla ES6 classes you should check [kaop-ts](https://github.com/k1r0s/kaop-ts) which is has a nicer look with ES7 Decorators.
+If you're looking for better experience using advices and vanilla ES6 classes you should check [kaop-ts](https://github.com/k1r0s/kaop-ts) which has a nicer look with ES7 Decorators.
 
 ### But this library isn't only about `Advices` right?
 
