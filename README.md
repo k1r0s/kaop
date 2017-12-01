@@ -10,12 +10,12 @@ Lightweight, solid, framework agnostic and **easy to use** library which provide
 
 ### Features, from bottom to top.
 
-- Better classes
+- ES6 class alternative
 - Inheritance
 - Composition
-- Override
+- Method Overriding
 - Dependency Injection
-- Aspect Oriented Extensions
+- AOP Extensions
 
 ### Get started
 
