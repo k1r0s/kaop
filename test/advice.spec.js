@@ -57,14 +57,12 @@ describe("advance reflect.advice specs", () => {
 
   })
 
-  it("Delay advice should stop the execution for at least one segond", () => {
+  it("Delay advice should stop the execution for at least one segond", done => {
     const time = Date.now();
-    return new Promise(resolve => {
-      personInstance.doSomething(function() {
-        expect(Date.now() - time).toBeGreaterThan(300);
-        resolve();
-      });
+    personInstance.doSomething(function() {
+      expect(Date.now() - time).toBeGreaterThan(280);
+      done();
     });
-  })
+  });
 
 })
