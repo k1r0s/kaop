@@ -40,7 +40,9 @@ arr.includes(2); // true
 arr.includes(5); // false
 ```
 
-Easy, right? lets try something else
+Easy, right? lets try something else.
+
+Say that for calculating John Doe's age we have to waste a lot of resources so we want to apply memoization to one method. 
 
 ```javascript
 // create a spy function
