@@ -55,17 +55,18 @@ function wove(target, props){
   return woved;
 }
 
-function createProxyFn(target, key, adviceList) {
+function createProxyFn(target, key, functionStack) {
   return function() {
     var adviceIndex = -1;
     function commitNext() {
       adviceIndex++;
-      if (adviceList[adviceIndex]) {
-        if (!utils.isMethod(adviceList[adviceIndex])) {
-          adviceList[adviceIndex].call(undefined, adviceMetadata);
-          if (!utils.isAsync(adviceList[adviceIndex])) { adviceMetadata.commit(); }
+      if (functionStack[adviceIndex]) {
+        var currentEntry = functionStack[adviceIndex];
+        if (!utils.isMethod(currentEntry)) {
+          currentEntry.call(undefined, adviceMetadata);
+          if (!utils.isAsync(currentEntry)) { adviceMetadata.commit(); }
         } else {
-          adviceMetadata.result = adviceList[adviceIndex].apply(adviceMetadata.scope, adviceMetadata.args);
+          adviceMetadata.result = currentEntry.apply(adviceMetadata.scope, adviceMetadata.args);
           adviceMetadata.commit();
         }
       }
@@ -75,7 +76,7 @@ function createProxyFn(target, key, adviceList) {
       args: Array.prototype.slice.call(arguments),
       scope: this,
       key: key,
-      method: utils.getMethodFromArraySignature(adviceList),
+      method: utils.getMethodFromArraySignature(functionStack),
       target: target,
       result: undefined,
       commit: commitNext,
@@ -111,11 +112,11 @@ function index(props) {
   return def(function() {}, props)
 }
 
-function extend$1(parent, props) {
+function extend(parent, props) {
   return def(parent, props)
 }
 
-function clear$1(targetClass){
+function clear(targetClass){
   for (var key in targetClass.signature) {
     if(targetClass.signature[key] instanceof Array && utils.isValidArraySignature(targetClass.signature[key])) {
       targetClass.prototype[key] = utils.getMethodFromArraySignature(targetClass.signature[key]);
@@ -127,8 +128,8 @@ function clear$1(targetClass){
 // oop
 var main = {
   createClass: index,
-  extend: extend$1,
-  clear: clear$1
+  extend: extend,
+  clear: clear
 };
 
 var apply = reflect.advice(function(meta) {
@@ -185,25 +186,15 @@ var provider = {
   singleton: singleton
 };
 
-var createClass = main.createClass;
-var extend = main.extend;
-var clear = main.clear;
-
-
-
-
-
-var kaop = {
-  createClass: createClass,
-  extend: extend,
-  clear: clear,
+var src = {
+  createClass: main.createClass,
+  extend: main.extend,
+  clear: main.clear,
   override: override,
   inject: inject,
   provider: provider,
   reflect: reflect
 };
-
-var src = kaop;
 
 return src;
 
