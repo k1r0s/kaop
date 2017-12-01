@@ -1,5 +1,6 @@
 ![kaop](http://i.imgur.com/6biEpsq.png)
 
+[![Image travis](https://travis-ci.org/k1r0s/kaop-ts.svg?branch=master)](https://travis-ci.org/k1r0s/)
 [![version](https://img.shields.io/npm/v/kaop.svg)](https://www.npmjs.com/package/kaop/)
 [![dependencies](https://david-dm.org/k1r0s/kaop/status.svg)](https://david-dm.org/k1r0s/kaop/status.svg)
 [![dev-dependencies](https://david-dm.org/k1r0s/kaop/dev-status.svg)](https://www.npmjs.com/package/kaop)
