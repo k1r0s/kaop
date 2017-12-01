@@ -9,6 +9,17 @@
 
 Lightweight, solid, framework agnostic and **easy to use** library which provides reflection features to deal with *Cross Cutting Concerns* and improve modularity in your code.
 
+### Try it!
+
+Clone the repo:
+`git clone https://github.com/k1r0s/kaop.git`
+
+Run showcase:
+`node showcase.js`
+
+Run tests:
+`npm test`
+
 ### Features, from bottom to top.
 
 - ES6 class alternative
@@ -42,7 +53,7 @@ arr.includes(5); // false
 
 Easy, right? lets try something else.
 
-Say that for calculating John Doe's age we have to waste a lot of resources so we want to apply memoization to one method. 
+Say that for calculating John Doe's age we have to waste a lot of resources so we want to apply memoization to one method.
 
 ```javascript
 // create a spy function
