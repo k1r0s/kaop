@@ -1,4 +1,5 @@
 import commonjs from 'rollup-plugin-commonjs';
+import uglify from 'rollup-plugin-uglify';
 import buble from 'rollup-plugin-buble';
 import pkg from './package.json';
 
@@ -10,6 +11,7 @@ export default [
 		],
 		name: 'kaop',
 		plugins: [
+			uglify(),
 			commonjs(),
 			buble({
 				exclude: ['node_modules/**']
