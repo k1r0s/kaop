@@ -33,9 +33,15 @@ function createProxyFn(target, key, functionStack) {
           currentEntry.call(undefined, adviceMetadata);
           if (!utils.isAsync(currentEntry)) adviceMetadata.commit();
         } else {
-          adviceMetadata.result = currentEntry.apply(adviceMetadata.scope, adviceMetadata.args);
+          try {
+            adviceMetadata.result = currentEntry.apply(adviceMetadata.scope, adviceMetadata.args);
+          } catch (e) {
+            adviceMetadata.exception = e;
+          }
           adviceMetadata.commit();
         }
+      } else {
+        if(adviceMetadata.exception) throw adviceMetadata.exception;
       }
     }
 
@@ -45,10 +51,18 @@ function createProxyFn(target, key, functionStack) {
       key: key,
       method: utils.getMethodFromArraySignature(functionStack),
       target: target,
+      exception: undefined,
       result: undefined,
       commit: commitNext,
-      break: function() { this.commit = function() {} }
-    };
+      handle: function() {
+        const ext = this.exception;
+        delete this.exception;
+        return ext;
+      },
+      break: function() {
+        this.commit = function() {}
+      }
+    }
 
     commitNext();
 
