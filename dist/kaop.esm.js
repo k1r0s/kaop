@@ -58,15 +58,14 @@ function createProxyFn(target, key, functionStack) {
         var currentEntry = functionStack[adviceIndex];
         if (!utils.isMethod(currentEntry)) {
           currentEntry.call(undefined, adviceMetadata);
-          if (!utils.isAsync(currentEntry)) { adviceMetadata.commit(); }
-        } else {
+        } else if (!adviceMetadata.prevented) {
           try {
             adviceMetadata.result = currentEntry.apply(adviceMetadata.scope, adviceMetadata.args);
           } catch (e) {
             adviceMetadata.exception = e;
           }
-          adviceMetadata.commit();
         }
+        if (!utils.isAsync(currentEntry)) { adviceMetadata.commit(); }
       } else {
         if(adviceMetadata.exception) { throw adviceMetadata.exception; }
       }
@@ -79,8 +78,12 @@ function createProxyFn(target, key, functionStack) {
       method: utils.getMethodFromArraySignature(functionStack),
       target: target,
       exception: undefined,
+      prevented: undefined,
       result: undefined,
       commit: commitNext,
+      prevent: function() {
+        this.prevented = true;
+      },
       handle: function() {
         var ext = this.exception;
         delete this.exception;
