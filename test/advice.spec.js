@@ -38,7 +38,7 @@ const Person = createClass({
   },
 
   testBreak: [
-    reflect.advice(meta => meta.break()),
+    reflect.advice(meta => meta.skip()),
     reflect.advice(_ => { throw new Error("avoooid!") }),
     function(num) {
       return num * num;

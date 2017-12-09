@@ -25,7 +25,18 @@ function wove(target, props){
 function createProxyFn(target, key, functionStack) {
   return function() {
     let adviceIndex = -1;
-    function commitNext() {
+    function skip () {
+      adviceIndex = functionStack.findIndex(utils.isMethod) - 1;
+    }
+    function handle () {
+      const ext = adviceMetadata.exception;
+      delete adviceMetadata.exception;
+      return ext;
+    }
+    function prevent () {
+      adviceMetadata.prevented = true;
+    }
+    function commit () {
       adviceIndex++;
       if (functionStack[adviceIndex]) {
         const currentEntry = functionStack[adviceIndex];
@@ -53,21 +64,13 @@ function createProxyFn(target, key, functionStack) {
       exception: undefined,
       prevented: undefined,
       result: undefined,
-      commit: commitNext,
-      prevent: function() {
-        this.prevented = true;
-      },
-      handle: function() {
-        const ext = this.exception;
-        delete this.exception;
-        return ext;
-      },
-      break: function() {
-        adviceIndex = functionStack.findIndex(utils.isMethod) - 1;
-      }
+      commit,
+      prevent,
+      handle,
+      skip
     }
 
-    commitNext();
+    commit();
 
     return adviceMetadata.result;
   }
