@@ -90,7 +90,7 @@ function createProxyFn(target, key, functionStack) {
         return ext;
       },
       break: function() {
-        this.commit = function() {};
+        adviceIndex = functionStack.findIndex(utils.isMethod) - 1;
       }
     };
 

@@ -12,7 +12,7 @@ const Cache = (function() {
 
       if(meta.scope[CACHE_KEY][meta.key]) {
         meta.result = meta.scope[CACHE_KEY][meta.key];
-        meta.break();
+        meta.prevent();
       }
     }),
     write: reflect.advice(meta => {
@@ -36,6 +36,14 @@ const Person = createClass({
   sayHello(){
     return `hello, I'm ${this.name}, and I'm ${this._veryHeavyCalculation()} years old`;
   },
+
+  testBreak: [
+    reflect.advice(meta => meta.break()),
+    reflect.advice(_ => { throw new Error("avoooid!") }),
+    function(num) {
+      return num * num;
+    }
+  ],
 
   doSomething: [Delay(300), function(cbk) {
     cbk();
@@ -63,6 +71,10 @@ describe("advance reflect.advice specs", () => {
       expect(Date.now() - time).toBeGreaterThan(280);
       done();
     });
+  });
+
+  it("meta.break should jump to main method", () => {
+    expect(personInstance.testBreak(2)).toBe(4);
   });
 
 })
