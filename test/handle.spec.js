@@ -6,6 +6,10 @@ const onException = reflect.advice(meta => {
   // console.warn(err);
 })
 
+const preventOnError = reflect.advice(meta => {
+  if(meta.method.toString().includes("Error")) meta.prevent();
+})
+
 const Person = createClass({
   sayHello: [function() {
     throw new Error("sayHello err");
@@ -15,7 +19,10 @@ const Person = createClass({
   }],
   sayHallo() {
     throw new Error("sayHallo err");
-  }
+  },
+  sayHellio: [preventOnError, function() {
+    throw new Error("sayHellio err");
+  }]
 });
 
 let personInstance;
@@ -30,5 +37,9 @@ describe("exception handling advice", () => {
     expect(personInstance.sayHollo).toThrow(Error);
     expect(personInstance.sayHallo).toThrow(Error);
   });
+
+  it("meta.prevent should avoid main method execution", () => {
+    personInstance.sayHellio();
+  })
 
 })
