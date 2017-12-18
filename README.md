@@ -2,6 +2,7 @@
 
 [![Image travis](https://travis-ci.org/k1r0s/kaop-ts.svg?branch=master)](https://travis-ci.org/k1r0s/)
 [![version](https://img.shields.io/npm/v/kaop.svg)](https://www.npmjs.com/package/kaop/)
+[![Coverage Status](https://coveralls.io/repos/github/k1r0s/kaop/badge.svg?branch=master)](https://coveralls.io/github/k1r0s/kaop?branch=master)
 [![dependencies](https://david-dm.org/k1r0s/kaop/status.svg)](https://david-dm.org/k1r0s/kaop/status.svg)
 [![dev-dependencies](https://david-dm.org/k1r0s/kaop/dev-status.svg)](https://www.npmjs.com/package/kaop)
 [![downloads](https://img.shields.io/npm/dm/kaop.svg)](https://www.npmjs.com/package/kaop)
