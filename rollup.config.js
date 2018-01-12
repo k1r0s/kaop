@@ -7,9 +7,8 @@ export default [
 	{
 		input: 'src/index.js',
 		output: [
-			{ file: pkg.browser, format: 'umd' }
+			{ file: pkg.browser, name: 'kaop', format: 'umd' }
 		],
-		name: 'kaop',
 		plugins: [
 			uglify(),
 			commonjs(),
