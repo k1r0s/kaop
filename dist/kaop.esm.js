@@ -37,7 +37,6 @@ function aspect(fn){
     return Object.keys(props).reduce(fn, props)
   };
 }
-
 function wove(target, props){
   var woved = Object.assign({}, props);
 
@@ -209,5 +208,13 @@ var src = {
   provider: provider,
   reflect: reflect
 };
+var src_1 = src.createClass;
+var src_2 = src.extend;
+var src_3 = src.clear;
+var src_4 = src.override;
+var src_5 = src.inject;
+var src_6 = src.provider;
+var src_7 = src.reflect;
 
 export default src;
+export { src_1 as createClass, src_2 as extend, src_3 as clear, src_4 as override, src_5 as inject, src_6 as provider, src_7 as reflect };
