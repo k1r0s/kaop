@@ -148,14 +148,14 @@ const StorageProvider = provider.singleton(Storage);
 
 // and then you inject it in several classes
 const Model1 = createClass({
-  constructor: [inject.args(StorageProvider), function(_storage) {
-    this.storage = _store;
+  constructor: [inject.args(StorageProvider), function(_storageInstance) {
+    this.storage = _storageInstance;
   }]
 });
 
 const Model2 = createClass({
-  constructor: [inject.args(StorageProvider), function(_storage) {
-    this.storage = _store;
+  constructor: [inject.args(StorageProvider), function(_storageInstance) {
+    this.storage = _storageInstance;
   }]
 });
 
