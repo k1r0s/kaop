@@ -11,8 +11,8 @@ function getMethodFromArraySignature(adviceList) {
   return adviceList.find(isMethod);
 }
 
-function createInstance(_type) {
-  return new _type;
+function createInstance(_type, args) {
+  return new (Function.prototype.bind.apply(_type, args));
 }
 
 function isAsync(rawAdvice) {

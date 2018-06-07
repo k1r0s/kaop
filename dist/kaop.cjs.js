@@ -1,7 +1,5 @@
 'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
 function isMethod(fn) {
   return !fn.advice
 }
@@ -15,8 +13,8 @@ function getMethodFromArraySignature(adviceList) {
   return adviceList.find(isMethod);
 }
 
-function createInstance(_type) {
-  return new _type;
+function createInstance(_type, args) {
+  return new (Function.prototype.bind.apply(_type, args));
 }
 
 function isAsync(rawAdvice) {
@@ -41,6 +39,7 @@ function aspect(fn){
     return Object.keys(props).reduce(fn, props)
   };
 }
+
 function wove(target, props){
   var woved = Object.assign({}, props);
 
@@ -186,14 +185,14 @@ var inject = {
 
 function factory(targetClass){
   return function () {
-    return utils.createInstance(targetClass);
+    return utils.createInstance(targetClass, Array.prototype.slice.call(arguments));
   }
 }
 
 function singleton(targetClass) {
   var instance;
   return function () {
-    if (!instance) { instance = utils.createInstance(targetClass); }
+    if (!instance) { instance = utils.createInstance(targetClass, Array.prototype.slice.call(arguments)); }
     return instance;
   }
 }
@@ -212,19 +211,5 @@ var src = {
   provider: provider,
   reflect: reflect
 };
-var src_1 = src.createClass;
-var src_2 = src.extend;
-var src_3 = src.clear;
-var src_4 = src.override;
-var src_5 = src.inject;
-var src_6 = src.provider;
-var src_7 = src.reflect;
 
-exports.default = src;
-exports.createClass = src_1;
-exports.extend = src_2;
-exports.clear = src_3;
-exports.override = src_4;
-exports.inject = src_5;
-exports.provider = src_6;
-exports.reflect = src_7;
+module.exports = src;

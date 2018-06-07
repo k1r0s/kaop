@@ -2,14 +2,14 @@ const utils = require("./utils");
 
 function factory(targetClass){
   return function () {
-    return utils.createInstance(targetClass);
+    return utils.createInstance(targetClass, Array.prototype.slice.call(arguments));
   }
 }
 
 function singleton(targetClass) {
   let instance;
   return function () {
-    if (!instance) instance = utils.createInstance(targetClass);
+    if (!instance) instance = utils.createInstance(targetClass, Array.prototype.slice.call(arguments));
     return instance;
   }
 }
