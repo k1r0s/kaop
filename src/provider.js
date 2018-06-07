@@ -9,7 +9,8 @@ function factory(targetClass){
 function singleton(targetClass) {
   let instance;
   return function () {
-    if (!instance) instance = utils.createInstance(targetClass, Array.prototype.slice.call(arguments));
+    const args = Array.prototype.slice.call(arguments);
+    if (!instance) instance = utils.createInstance(targetClass, args);
     return instance;
   }
 }

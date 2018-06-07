@@ -12,6 +12,7 @@ function getMethodFromArraySignature(adviceList) {
 }
 
 function createInstance(_type, args) {
+  args.unshift(null)
   return new (Function.prototype.bind.apply(_type, args));
 }
 

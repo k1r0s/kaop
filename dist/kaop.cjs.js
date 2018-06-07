@@ -14,6 +14,7 @@ function getMethodFromArraySignature(adviceList) {
 }
 
 function createInstance(_type, args) {
+  args.unshift(null);
   return new (Function.prototype.bind.apply(_type, args));
 }
 
@@ -192,7 +193,8 @@ function factory(targetClass){
 function singleton(targetClass) {
   var instance;
   return function () {
-    if (!instance) { instance = utils.createInstance(targetClass, Array.prototype.slice.call(arguments)); }
+    var args = Array.prototype.slice.call(arguments);
+    if (!instance) { instance = utils.createInstance(targetClass, args); }
     return instance;
   }
 }
