@@ -1,5 +1,7 @@
 'use strict';
 
+Object.defineProperty(exports, '__esModule', { value: true });
+
 function isMethod(fn) {
   return !fn.advice
 }
@@ -40,7 +42,6 @@ function aspect(fn){
     return Object.keys(props).reduce(fn, props)
   };
 }
-
 function wove(target, props){
   var woved = Object.assign({}, props);
 
@@ -204,14 +205,30 @@ var provider = {
   singleton: singleton
 };
 
+var createClass = main.createClass;
+var extend$1 = main.extend;
+var clear$1 = main.clear;
+
+var override_1$1 = override;
+var inject_1$1 = inject;
+var provider_1$1 = provider;
+var reflect_1$1 = reflect;
+
 var src = {
-  createClass: main.createClass,
-  extend: main.extend,
-  clear: main.clear,
-  override: override,
-  inject: inject,
-  provider: provider,
-  reflect: reflect
+	createClass: createClass,
+	extend: extend$1,
+	clear: clear$1,
+	override: override_1$1,
+	inject: inject_1$1,
+	provider: provider_1$1,
+	reflect: reflect_1$1
 };
 
-module.exports = src;
+exports.default = src;
+exports.createClass = createClass;
+exports.extend = extend$1;
+exports.clear = clear$1;
+exports.override = override_1$1;
+exports.inject = inject_1$1;
+exports.provider = provider_1$1;
+exports.reflect = reflect_1$1;

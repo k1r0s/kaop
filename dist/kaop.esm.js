@@ -38,7 +38,6 @@ function aspect(fn){
     return Object.keys(props).reduce(fn, props)
   };
 }
-
 function wove(target, props){
   var woved = Object.assign({}, props);
 
@@ -202,14 +201,24 @@ var provider = {
   singleton: singleton
 };
 
+var createClass = main.createClass;
+var extend$1 = main.extend;
+var clear$1 = main.clear;
+
+var override_1$1 = override;
+var inject_1$1 = inject;
+var provider_1$1 = provider;
+var reflect_1$1 = reflect;
+
 var src = {
-  createClass: main.createClass,
-  extend: main.extend,
-  clear: main.clear,
-  override: override,
-  inject: inject,
-  provider: provider,
-  reflect: reflect
+	createClass: createClass,
+	extend: extend$1,
+	clear: clear$1,
+	override: override_1$1,
+	inject: inject_1$1,
+	provider: provider_1$1,
+	reflect: reflect_1$1
 };
 
 export default src;
+export { createClass, extend$1 as extend, clear$1 as clear, override_1$1 as override, inject_1$1 as inject, provider_1$1 as provider, reflect_1$1 as reflect };
