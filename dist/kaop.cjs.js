@@ -1,5 +1,7 @@
 'use strict';
 
+Object.defineProperty(exports, '__esModule', { value: true });
+
 function isMethod(fn) {
   return !fn.advice
 }
@@ -40,7 +42,6 @@ function aspect(fn){
     return Object.keys(props).reduce(fn, props)
   };
 }
-
 function wove(target, props){
   var woved = Object.assign({}, props);
 
@@ -213,5 +214,19 @@ var src = {
   provider: provider,
   reflect: reflect
 };
+var src_1 = src.createClass;
+var src_2 = src.extend;
+var src_3 = src.clear;
+var src_4 = src.override;
+var src_5 = src.inject;
+var src_6 = src.provider;
+var src_7 = src.reflect;
 
-module.exports = src;
+exports.default = src;
+exports.createClass = src_1;
+exports.extend = src_2;
+exports.clear = src_3;
+exports.override = src_4;
+exports.inject = src_5;
+exports.provider = src_6;
+exports.reflect = src_7;
