@@ -3,7 +3,6 @@
   "version": "4.1.1",
   "description": "Simple OOP JavaScript library with reflection techniques",
   "main": "dist/kaop.cjs.js",
-  "module": "dist/kaop.esm.js",
   "browser": "dist/kaop.umd.js",
   "scripts": {
     "test": "jest",
