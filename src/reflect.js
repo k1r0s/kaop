@@ -44,7 +44,8 @@ function createProxyFn(target, key, functionStack) {
           currentEntry.call(undefined, adviceMetadata);
         } else if (!adviceMetadata.prevented) {
           try {
-            adviceMetadata.result = currentEntry.apply(adviceMetadata.scope, adviceMetadata.args);
+            if(adviceMetadata.key === "constructor") adviceMetadata.scope = new currentEntry(adviceMetadata.args);
+            else adviceMetadata.result = currentEntry.apply(adviceMetadata.scope, adviceMetadata.args);
           } catch (e) {
             adviceMetadata.exception = e;
           }
