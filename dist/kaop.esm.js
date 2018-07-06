@@ -71,7 +71,13 @@ function createProxyFn(target, key, functionStack) {
           currentEntry.call(undefined, adviceMetadata);
         } else if (!adviceMetadata.prevented) {
           try {
-            adviceMetadata.result = currentEntry.apply(adviceMetadata.scope, adviceMetadata.args);
+            if(adviceMetadata.key === "constructor" && typeof adviceMetadata.target.super !== "function") {
+              var nscope = utils.createInstance(adviceMetadata.target, adviceMetadata.args);
+              Object.assign(nscope, adviceMetadata.scope);
+              adviceMetadata.result = adviceMetadata.scope = nscope;
+            } else {
+              adviceMetadata.result = currentEntry.apply(adviceMetadata.scope, adviceMetadata.args);
+            }
           } catch (e) {
             adviceMetadata.exception = e;
           }
