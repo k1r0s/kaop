@@ -45,7 +45,9 @@ function createProxyFn(target, key, functionStack, customInvoke) {
         } else if (!adviceMetadata.prevented) {
           try {
             if(customInvoke) {
-              adviceMetadata.result = customInvoke(adviceMetadata);
+              var nscope = customInvoke(adviceMetadata);
+              Object.assign(nscope, adviceMetadata.scope);
+              adviceMetadata.result = adviceMetadata.scope = nscope;
             } else {
               adviceMetadata.result = currentEntry.apply(adviceMetadata.scope, adviceMetadata.args);
             }
