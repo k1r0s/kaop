@@ -53,7 +53,7 @@ function wove(target, props){
   return woved;
 }
 
-function createProxyFn(target, key, functionStack) {
+function createProxyFn(target, key, functionStack, customInvoke) {
   return function() {
     var adviceIndex = -1;
     function skip () {
@@ -75,10 +75,8 @@ function createProxyFn(target, key, functionStack) {
           currentEntry.call(undefined, adviceMetadata);
         } else if (!adviceMetadata.prevented) {
           try {
-            if(adviceMetadata.key === "constructor" && typeof adviceMetadata.target.super !== "function") {
-              var nscope = utils.createInstance(adviceMetadata.target, adviceMetadata.args);
-              Object.assign(nscope, adviceMetadata.scope);
-              adviceMetadata.result = adviceMetadata.scope = nscope;
+            if(customInvoke) {
+              adviceMetadata.result = customInvoke(adviceMetadata);
             } else {
               adviceMetadata.result = currentEntry.apply(adviceMetadata.scope, adviceMetadata.args);
             }
@@ -98,6 +96,7 @@ function createProxyFn(target, key, functionStack) {
       key: key,
       method: utils.getMethodFromArraySignature(functionStack),
       target: target,
+      ES6newTarget: new.target,
       exception: undefined,
       prevented: undefined,
       result: undefined,
