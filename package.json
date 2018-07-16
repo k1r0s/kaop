@@ -1,6 +1,6 @@
 {
   "name": "kaop",
-  "version": "4.2.1",
+  "version": "4.2.2",
   "description": "Simple OOP JavaScript library with reflection techniques",
   "main": "dist/kaop.cjs.js",
   "module": "dist/kaop.esm.js",
