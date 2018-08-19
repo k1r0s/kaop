@@ -37,6 +37,9 @@ function createProxyFn(target, key, functionStack, customInvoke) {
       adviceMetadata.prevented = true;
     }
     function commit () {
+      const append = Array.prototype.slice.call(arguments);
+      adviceMetadata.args.push.apply(adviceMetadata.args, append);
+
       adviceIndex++;
       if (functionStack[adviceIndex]) {
         const currentEntry = functionStack[adviceIndex];
