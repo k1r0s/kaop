@@ -54,6 +54,20 @@ function wove(target, props){
 }
 
 function createProxyFn(target, key, functionStack, customInvoke) {
+  var shouldReturnPromise = functionStack.some(function (currentEntry) { return utils.isAsync(currentEntry); });
+  if(!shouldReturnPromise) { return createProxy(target, key, functionStack, customInvoke); }
+  else {
+    // yay, this is a bad practice, but easiest way to do this..
+    var auxResolve, auxReject;
+    var prom = new Promise(function (resolve, reject) {
+      auxResolve = resolve;
+      auxReject = reject;
+    });
+    return createProxy(target, key, functionStack, customInvoke, prom, auxResolve, auxReject);
+  }
+}
+
+function createProxy(target, key, functionStack, customInvoke, prom, resolve, reject) {
   return function() {
     var adviceIndex = -1;
     function skip () {
@@ -91,7 +105,10 @@ function createProxyFn(target, key, functionStack, customInvoke) {
         }
         if (!utils.isAsync(currentEntry)) { adviceMetadata.commit(); }
       } else {
-        if(adviceMetadata.exception) { throw adviceMetadata.exception; }
+        if(adviceMetadata.exception) {
+          if(prom) { reject(adviceMetadata.exception); }
+          else { throw adviceMetadata.exception; }
+        }        if(prom) { resolve(adviceMetadata.result); }
       }
     }
 
@@ -113,8 +130,9 @@ function createProxyFn(target, key, functionStack, customInvoke) {
 
     commit();
 
-    return adviceMetadata.result;
-  }
+    if(prom) { return prom; }
+    else { return adviceMetadata.result; }
+  };
 }
 
 var reflect = {
