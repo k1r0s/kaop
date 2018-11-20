@@ -54,7 +54,7 @@ function wove(target, props){
 }
 
 function createProxyFn(target, key, functionStack, customInvoke) {
-  var shouldReturnPromise = functionStack.some(function (currentEntry) { return utils.isAsync(currentEntry); });
+  var shouldReturnPromise = key !== "constructor" && functionStack.some(function (currentEntry) { return utils.isAsync(currentEntry); });
   if(!shouldReturnPromise) { return createProxy(target, key, functionStack, customInvoke); }
   else {
     // yay, this is a bad practice, but easiest way to do this..
