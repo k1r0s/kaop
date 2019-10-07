@@ -5,10 +5,10 @@ const handleError = reflect.advice(meta => meta.handle());
 
 const Dummy = createClass({
   do1: [delay, function() {
-    return Promise.resolve(10)
+    return Promise.resolve(1)
   }],
   do2: [function() {
-    return Promise.resolve(10)
+    return Promise.resolve(1)
   }],
   do3: [delay, function() {
     throw new Error("lmaooo")
@@ -25,11 +25,11 @@ describe("promise based advice", () => {
   })
 
   it("decorator should be able to return original value despite being wrapped by an asynchronous advice", () => {
-    return instance.do1().then(num => expect(num).toBe(10));
+    return instance.do1().then(num => expect(num).toBe(1));
   })
 
   it("method should be independent from advices", () => {
-    return instance.do2().then(num => expect(num).toBe(10));
+    return instance.do2().then(num => expect(num).toBe(1));
   })
 
   it("method should return a promise that rejects", () => {
@@ -38,5 +38,13 @@ describe("promise based advice", () => {
 
   it("should be able to work as spected when handling exceptions", () => {
     return instance.do4();
+  })
+
+  it("any async process shouldnt be resolved on subsequent calls", async () => {
+    const t0 = Date.now();
+    await instance.do1();
+    await instance.do1();
+    const elapsed = Date.now() - t0;
+    expect(elapsed).toBeGreaterThanOrEqual(20);
   })
 });
