@@ -54,22 +54,17 @@ function wove(target, props){
 }
 
 function createProxyFn(target, key, functionStack, customInvoke) {
-  var shouldReturnPromise = key !== "constructor" && functionStack.some(function (currentEntry) { return utils.isAsync(currentEntry); });
-  if(!shouldReturnPromise) { return createProxy(target, key, functionStack, customInvoke); }
-  else {
-    // yay, this is a bad practice, but easiest way to do this..
-    var auxResolve, auxReject;
-    var prom = new Promise(function (resolve, reject) {
-      auxResolve = resolve;
-      auxReject = reject;
-    });
-    return createProxy(target, key, functionStack, customInvoke, prom, auxResolve, auxReject);
-  }
-}
-
-function createProxy(target, key, functionStack, customInvoke, prom, resolve, reject) {
   return function() {
-    var adviceIndex = -1;
+    var adviceIndex = -1, prom, resolve, reject;
+
+    var shouldReturnPromise = key !== "constructor" && functionStack.some(function (currentEntry) { return utils.isAsync(currentEntry); });
+    if(shouldReturnPromise) {
+      prom = new Promise(function (_resolve, _reject) {
+        resolve = _resolve;
+        reject = _reject;
+      });
+    }
+
     function skip () {
       adviceIndex = functionStack.findIndex(utils.isMethod) - 1;
     }

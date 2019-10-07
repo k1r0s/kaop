@@ -23,24 +23,17 @@ function wove(target, props){
 }
 
 function createProxyFn(target, key, functionStack, customInvoke) {
-  return createProxy(
-    target,
-    key,
-    functionStack,
-    customInvoke,
-    key !== "constructor" && functionStack.some((currentEntry) => utils.isAsync(currentEntry))
-  );
-}
-
-function createProxy(target, key, functionStack, customInvoke, shouldReturnPromise, prom, resolve, reject) {
   return function() {
-    if(shouldReturnPromise){
-      prom = new Promise((_resolve, _reject) => {
+    let adviceIndex = -1, prom, resolve, reject;
+
+    const shouldReturnPromise = key !== "constructor" && functionStack.some(currentEntry => utils.isAsync(currentEntry));
+    if(shouldReturnPromise) {
+      prom = new Promise(function (_resolve, _reject) {
         resolve = _resolve;
         reject = _reject;
       });
     }
-    let adviceIndex = -1;
+
     function skip () {
       adviceIndex = functionStack.findIndex(utils.isMethod) - 1;
     }
