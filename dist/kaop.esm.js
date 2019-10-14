@@ -228,20 +228,20 @@ var createClass = main.createClass;
 var extend$1 = main.extend;
 var clear$1 = main.clear;
 
-var override_1$1 = override;
-var inject_1$1 = inject;
-var provider_1$1 = provider;
-var reflect_1$1 = reflect;
+var override_1 = override;
+var inject_1 = inject;
+var provider_1 = provider;
+var reflect_1 = reflect;
 
 var src = {
 	createClass: createClass,
 	extend: extend$1,
 	clear: clear$1,
-	override: override_1$1,
-	inject: inject_1$1,
-	provider: provider_1$1,
-	reflect: reflect_1$1
+	override: override_1,
+	inject: inject_1,
+	provider: provider_1,
+	reflect: reflect_1
 };
 
 export default src;
-export { createClass, extend$1 as extend, clear$1 as clear, override_1$1 as override, inject_1$1 as inject, provider_1$1 as provider, reflect_1$1 as reflect };
+export { clear$1 as clear, createClass, extend$1 as extend, inject_1 as inject, override_1 as override, provider_1 as provider, reflect_1 as reflect };
