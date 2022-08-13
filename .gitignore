@@ -2,3 +2,5 @@ node_modules/
 coverage/
 coverage.s
 .coveralls.yml
+src/index.d.ts
+src/index.js

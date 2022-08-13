@@ -2,6 +2,14 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
+function unwrapExports (x) {
+	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
+}
+
+function createCommonjsModule(fn, module) {
+	return module = { exports: {} }, fn(module, module.exports), module.exports;
+}
+
 function isMethod(fn) {
   return !fn.advice
 }
@@ -228,30 +236,31 @@ var provider = {
   singleton: singleton
 };
 
-var createClass = main.createClass;
-var extend$1 = main.extend;
-var clear$1 = main.clear;
+var src = createCommonjsModule(function (module, exports) {
+exports.__esModule = true;
+exports.reflect = exports.provider = exports.inject = exports.override = exports.clear = exports.extend = exports.createClass = void 0;
 
-var override_1 = override;
-var inject_1 = inject;
-var provider_1 = provider;
-var reflect_1 = reflect;
+exports.createClass = main.createClass, exports.extend = main.extend, exports.clear = main.clear;
+exports.override = override;
+exports.inject = inject;
+exports.provider = provider;
+exports.reflect = reflect;
+});
 
-var src = {
-	createClass: createClass,
-	extend: extend$1,
-	clear: clear$1,
-	override: override_1,
-	inject: inject_1,
-	provider: provider_1,
-	reflect: reflect_1
-};
+var index$1 = unwrapExports(src);
+var src_1 = src.reflect;
+var src_2 = src.provider;
+var src_3 = src.inject;
+var src_4 = src.override;
+var src_5 = src.clear;
+var src_6 = src.extend;
+var src_7 = src.createClass;
 
-exports.clear = clear$1;
-exports.createClass = createClass;
-exports.default = src;
-exports.extend = extend$1;
-exports.inject = inject_1;
-exports.override = override_1;
-exports.provider = provider_1;
-exports.reflect = reflect_1;
+exports.clear = src_5;
+exports.createClass = src_7;
+exports.default = index$1;
+exports.extend = src_6;
+exports.inject = src_3;
+exports.override = src_4;
+exports.provider = src_2;
+exports.reflect = src_1;

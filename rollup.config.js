@@ -1,6 +1,7 @@
 import commonjs from 'rollup-plugin-commonjs';
 import uglify from 'rollup-plugin-uglify';
 import buble from 'rollup-plugin-buble';
+import typescript from 'rollup-plugin-typescript2';
 import pkg from './package.json';
 
 export default [
@@ -10,6 +11,7 @@ export default [
 			{ file: pkg.browser, name: 'kaop', format: 'umd' }
 		],
 		plugins: [
+      typescript(),
 			uglify(),
 			commonjs(),
 			buble({
